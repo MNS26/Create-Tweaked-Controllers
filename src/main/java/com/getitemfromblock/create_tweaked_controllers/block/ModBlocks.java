@@ -5,8 +5,15 @@ import net.minecraft.world.level.block.Blocks;
 import static com.simibubi.create.foundation.data.TagGen.axeOnly;
 
 import com.getitemfromblock.create_tweaked_controllers.CreateTweakedControllers;
-import com.getitemfromblock.create_tweaked_controllers.ModTab;
+//import com.getitemfromblock.create_tweaked_controllers.ModTab;
 
+/**
+ * Registry class for all blocks added by the mod.
+ * <p>
+ * Currently registers only the {@link TweakedLecternControllerBlock}.
+ * Uses Create's Registrate system for block registration, blockstate generation,
+ * and loot table configuration.
+ */
 public class ModBlocks
 {
     public static final BlockEntry<TweakedLecternControllerBlock> TWEAKED_LECTERN_CONTROLLER =

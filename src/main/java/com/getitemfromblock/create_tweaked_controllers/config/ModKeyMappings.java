@@ -9,6 +9,16 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
+/**
+ * Registers custom keybindings for the mod.
+ * <p>
+ * Three keybinds are defined:
+ * <ul>
+ *   <li>{@link #KEY_MOUSE_FOCUS} (LALT) - hold/toggle to capture mouse for controller input</li>
+   <li>{@link #KEY_MOUSE_RESET} (R) - reset mouse cursor to center position</li>
+ *   <li>{@link #KEY_CONTROLLER_EXIT} (TAB) - exit controller mode</li>
+ * </ul>
+ */
 @EventBusSubscriber(modid = CreateTweakedControllers.ID, value = Dist.CLIENT)
 public class ModKeyMappings
 {

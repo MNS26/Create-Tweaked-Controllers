@@ -3,6 +3,20 @@ package com.getitemfromblock.create_tweaked_controllers.config;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 
+/**
+ * Client-side configuration for the mod, defined using NeoForge's ModConfigSpec.
+ * <p>
+ * Configuration options:
+ * <ul>
+ *   <li>{@code use_custom_mappings} - enable advanced input mapping (default: false)</li>
+ *   <li>{@code toggle_mouse_focus} - toggle vs hold for mouse capture key (default: false)</li>
+ *   <li>{@code auto_reset_mouse_focus} - auto-center cursor when controller deactivates (default: true)</li>
+ *   <li>{@code controller_layout_type} - controller display style: XBOX, NINTENDO, PLAYSTATION (default: XBOX)</li>
+ *   <li>{@code config_button_*} - position of the config button in main/in-game menus</li>
+ * </ul>
+ *
+ * @see ModConfigs
+ */
 public class ModClientConfig
 {
     public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();

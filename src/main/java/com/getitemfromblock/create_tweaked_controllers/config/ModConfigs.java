@@ -5,6 +5,11 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 
 
+/**
+ * Registers all mod configuration files with NeoForge's config system.
+ * <p>
+ * Currently only registers the client config ({@link ModClientConfig}).
+ */
 public class ModConfigs
 {
     public static void register(ModContainer container)

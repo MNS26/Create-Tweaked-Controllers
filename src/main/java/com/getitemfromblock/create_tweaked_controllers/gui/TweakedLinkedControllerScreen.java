@@ -28,6 +28,20 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 
+/**
+ * Container screen for the Tweaked Linked Controller's frequency configuration GUI.
+ * <p>
+ * Two-page interface:
+ * <ul>
+ *   <li><b>Page 1</b>: 15 button frequency slots with visual controller layout</li>
+ *   <li><b>Page 2</b>: 10 axis frequency slots with joystick previews and axis value displays</li>
+ * </ul>
+ * Shows the currently selected gamepad index, supports refresh to detect new controllers,
+ * and provides reset/confirm buttons. Frequency slots are configured by placing Redstone
+ * Link frequency items from the player's inventory.
+ *
+ * @see TweakedLinkedControllerMenu
+ */
 public class TweakedLinkedControllerScreen extends AbstractSimiContainerScreen<TweakedLinkedControllerMenu>
 {
 

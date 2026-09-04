@@ -12,9 +12,20 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+/**
+ * Mouse scroll wheel input implementation for the controller mapping system.
+ * <p>
+ * Tracks accumulated scroll wheel delta. Supports configurable min/max bounds
+ * for normalizing the scroll value. Useful for incremental adjustments like
+ * speed control or fine-tuning axis values.
+ *
+ * @see MouseCursorHandler
+ */
 public class MouseWheelInput implements GenericInput
 {
+    /** Minimum bound for normalization. */
     public float minBound = 0.0f;
+    /** Maximum bound for normalization. */
     public float maxBound = 1.0f;
 
     public MouseWheelInput(float min, float max)

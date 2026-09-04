@@ -8,6 +8,13 @@ import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Configuration screen for keyboard key inputs.
+ * <p>
+ * Provides a single "Invert" checkbox that reverses the key state.
+ *
+ * @see KeyboardInput
+ */
 public class KeyboardInputScreen extends GenericInputScreen
 {
     public KeyboardInput source;

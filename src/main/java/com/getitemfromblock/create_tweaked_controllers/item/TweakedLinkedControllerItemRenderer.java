@@ -31,6 +31,24 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
+/**
+ * Custom item renderer for the Tweaked Linked Controller.
+ * <p>
+ * Renders the controller as a 3D model with animated buttons, joysticks, and triggers.
+ * Supports three controller layout styles (Xbox, Nintendo, PlayStation) via partial models.
+ * <p>
+ * Animation is driven by {@link LerpedFloat} interpolation:
+ * <ul>
+ *   <li>Button presses are smoothly animated with exponential chasers</li>
+ *   <li>Joystick tilt is linearly interpolated to match the physical stick position</li>
+ *   <li>Trigger pull is linearly interpolated based on axis value</li>
+ * </ul>
+ * The renderer handles both first-person hand rendering and lectern block rendering,
+ * with equip progress animation when switching between active/inactive states.
+ *
+ * @see TweakedLecternControllerRenderer
+ * @see TweakedLinkedControllerClientHandler
+ */
 public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModelRenderer
 {
     protected static final PartialModel BASE = PartialModel.of(CreateTweakedControllers.asResource("item/tweaked_linked_controller/powered"));

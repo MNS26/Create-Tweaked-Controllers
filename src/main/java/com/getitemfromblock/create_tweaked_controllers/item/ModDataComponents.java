@@ -11,6 +11,13 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+/**
+ * Registry for NeoForge data components used by the mod.
+ * <p>
+ * Defines the {@link #TWEAKED_CONTROLLER_ITEMS} component that stores the controller's
+ * frequency items as {@link ItemContainerContents}. This replaces the legacy NBT-based
+ * storage system introduced in Minecraft 1.21.
+ */
 public class ModDataComponents
 {
     private static final DeferredRegister.DataComponents DATA_COMPONENTS =

@@ -11,6 +11,15 @@ import net.createmod.catnip.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Tintable digit display widget for showing numeric values in the controller GUI.
+ * <p>
+ * Used to display gamepad index and axis values in the frequency configuration screen.
+ * Supports color tinting and icon swapping via {@link #setIcon(ScreenElement)}.
+ *
+ * @see DigitIconRenderer
+ * @see TweakedLinkedControllerScreen
+ */
 public class DigitIcon extends AbstractSimiWidget
 {
     protected ScreenElement icon;

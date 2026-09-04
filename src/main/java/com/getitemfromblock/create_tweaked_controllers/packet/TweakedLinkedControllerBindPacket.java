@@ -17,6 +17,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+/**
+ * Packet sent from client to server to bind a controller input to a Redstone Link's frequency.
+ * <p>
+ * Sent during bind mode when the player presses a button or moves an axis while
+ * looking at a Redstone Link. The packet carries:
+ * <ul>
+ *   <li>The input index (0-14 for buttons, 15-24 for axes)</li>
+ *   <li>The Redstone Link's block position</li>
+ * </ul>
+ * On the server, the handler reads the Redstone Link's frequency pair and stores
+ * it in the controller item's frequency slot at the given input index.
+ */
 public class TweakedLinkedControllerBindPacket extends TweakedLinkedControllerPacketBase
 {
     public static final Type<TweakedLinkedControllerBindPacket> TYPE = new Type<>(

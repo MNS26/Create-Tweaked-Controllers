@@ -9,11 +9,26 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Configuration screen for joystick axis inputs.
+ * <p>
+ * Provides editable fields for:
+ * <ul>
+ *   <li>Minimum bound (lower threshold for normalization)</li>
+ *   <li>Maximum bound (upper threshold for normalization)</li>
+ *   <li>Deadzone threshold (values below this are treated as zero)</li>
+ * </ul>
+ * Also shows a live preview of the raw axis value for testing.
+ *
+ * @see JoystickAxisInput
+ * @see GenericInputScreen
+ */
 public class JoystickAxisScreen extends GenericInputScreen
 {
     public JoystickAxisInput source;
     private EditBox[] bounds;
     private EditBox valueRender;
+    private EditBox deadzoneBox;
     private int boundsTextWidth = 0;
 
     public JoystickAxisScreen(Screen parent, Component name, JoystickAxisInput s)
@@ -29,10 +44,12 @@ public class JoystickAxisScreen extends GenericInputScreen
         source.minBound = ParseFloatAndCorrectValue(bounds[0]);
         source.maxBound = ParseFloatAndCorrectValue(bounds[1]);
         if (bounds[0].isFocused()) bounds[1].setFocused(false);
+        source.deadzone = ParseFloatAndCorrectValue(deadzoneBox);
         valueRender.setValue(String.format("%.03f", source.GetRawInput()));
         valueRender.setFocused(false);
         graphics.drawString(font, CreateTweakedControllers.translateDirect("gui_config_lower"), width / 2 - boundsTextWidth, height / 2 - 50, 0xaaaaaa);
         graphics.drawString(font, CreateTweakedControllers.translateDirect("gui_config_upper"),width / 2 - boundsTextWidth, height / 2 - 25, 0xaaaaaa);
+        graphics.drawString(font, CreateTweakedControllers.translateDirect("gui_config_deadzone"),width / 2 - boundsTextWidth, height / 2 + 5, 0xaaaaaa);
         graphics.drawString(font, CreateTweakedControllers.translateDirect("gui_input_axis"), width / 2 - textwidth, height - 105, 0xaaaaaa);
     }
 
@@ -51,13 +68,20 @@ public class JoystickAxisScreen extends GenericInputScreen
         bounds[1] = new EditBox(font, width / 2, height/2 - 30, 90, 20, CreateTweakedControllers.translateDirect("gui_config_upper"));
         bounds[1].setValue(GetSafeFloatString(source.maxBound));
         addRenderableWidgets(bounds);
+
+        deadzoneBox  = new EditBox(font, width / 2, height / 2, 90, 20, CreateTweakedControllers.translateDirect("gui_config_deadzone"));
+        deadzoneBox.setEditable(true);
+        deadzoneBox.setValue(GetSafeFloatString(source.deadzone));
+        addRenderableWidget(deadzoneBox);
+
         valueRender = new EditBox(font, width / 2, height - 110, 50, 20, CreateTweakedControllers.translateDirect("gui_input_axis"));
         valueRender.setEditable(false);
         valueRender.setTextColorUneditable(0xffffff);
         addRenderableWidget(valueRender);
+
         int l = Minecraft.getInstance().font.width(valueRender.getMessage()) + 10;
         if (l > textwidth) textwidth = l;
-        boundsTextWidth = Math.max(font.width(CreateTweakedControllers.translateDirect("gui_config_lower")), font.width(CreateTweakedControllers.translateDirect("gui_config_upper")));
+        boundsTextWidth = Math.max(font.width(CreateTweakedControllers.translateDirect("gui_config_lower")), Math.max(font.width(CreateTweakedControllers.translateDirect("gui_config_upper")), font.width(CreateTweakedControllers.translateDirect("gui_config_deadzone"))));
         boundsTextWidth += 10;
     }
     

@@ -18,6 +18,12 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+/**
+ * Icon spritesheet for the mod's GUI buttons and indicators.
+ * <p>
+ * Icons are arranged in a 32x32 atlas texture and accessed by row/column position.
+ * Used for tab buttons (buttons/axes) and joystick indicators in the configuration screens.
+ */
 public class ModIcons implements ScreenElement
 {
     public static final ResourceLocation ICON_ATLAS = CreateTweakedControllers.asResource("textures/gui/icons.png");

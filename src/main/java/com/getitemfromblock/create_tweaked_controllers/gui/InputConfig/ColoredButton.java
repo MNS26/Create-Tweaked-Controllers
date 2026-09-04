@@ -10,6 +10,12 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+/**
+ * A button with a custom tint color, used for the reset/save/load buttons
+ * in the controller configuration screen.
+ *
+ * @see ModControllerConfigScreen
+ */
 public class ColoredButton extends Button
 {
     public Vector3f color;

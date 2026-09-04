@@ -18,6 +18,15 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
+/**
+ * Spritesheet renderer for single-digit numeric displays.
+ * <p>
+ * Provides digit glyphs (0-9), empty, dash, and cross symbols from a 32x32 atlas texture.
+ * Each digit is 6x10 pixels. Used by {@link DigitIcon} to display axis values
+ * and gamepad indices in the frequency configuration screen.
+ *
+ * @see DigitIcon
+ */
 public class DigitIconRenderer implements ScreenElement
 {
     public static final ResourceLocation DIGIT_ATLAS = CreateTweakedControllers.asResource("textures/gui/digits.png");

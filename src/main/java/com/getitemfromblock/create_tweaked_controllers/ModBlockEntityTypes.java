@@ -7,6 +7,12 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 
+/**
+ * Registry for block entity types added by the mod.
+ * <p>
+ * Registers the {@link TweakedLecternControllerBlockEntity} with its renderer
+ * using Create's Registrate system.
+ */
 public class ModBlockEntityTypes
 {
     private static final CreateRegistrate REGISTRATE = CreateTweakedControllers.registrate();

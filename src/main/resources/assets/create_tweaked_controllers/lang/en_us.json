@@ -78,6 +78,7 @@
     "create_tweaked_controllers.gui_config_invert": "Invert button output value",
     "create_tweaked_controllers.gui_config_lower": "Lower axis input bound",
     "create_tweaked_controllers.gui_config_upper": "Upper axis input bound",
+    "create_tweaked_controllers.gui_config_deadzone": "Deadzone threshold",
     "create_tweaked_controllers.gui_config_isyaxis": "Use Y instead of X input ?",
     "create_tweaked_controllers.gui_config_usevelocity": "Use velocity instead of position ?",
     

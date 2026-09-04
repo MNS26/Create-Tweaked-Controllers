@@ -10,6 +10,19 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Configuration screen for mouse axis inputs.
+ * <p>
+ * Provides controls for:
+ * <ul>
+ *   <li>Y-axis checkbox: track vertical instead of horizontal movement</li>
+ *   <li>Velocity checkbox: use cursor speed instead of cumulative position</li>
+ *   <li>Min/max bound fields for normalization</li>
+ * </ul>
+ * Shows a live preview of the raw axis value.
+ *
+ * @see MouseAxisInput
+ */
 public class MouseAxisScreen extends GenericInputScreen
 {
     public MouseAxisInput source;

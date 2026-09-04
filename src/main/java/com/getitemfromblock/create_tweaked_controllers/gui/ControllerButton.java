@@ -11,6 +11,16 @@ import net.createmod.catnip.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Visual representation of a gamepad button in the configuration GUI.
+ * <p>
+ * Renders a colored icon at a fixed position with optional displacement (for joystick movement).
+ * Supports color intensity modulation via {@link #SetColorFactor(float)} to indicate
+ * pressed/unpressed states. Non-interactive (clicks are ignored).
+ *
+ * @see ModControllerConfigScreen
+ * @see ControllerButtonRenderer
+ */
 public class ControllerButton extends AbstractSimiWidget
 {
     protected ScreenElement icon;
