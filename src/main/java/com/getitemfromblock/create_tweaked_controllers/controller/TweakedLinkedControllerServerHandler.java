@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import com.getitemfromblock.create_tweaked_controllers.packet.ModPackets;
+import com.getitemfromblock.create_tweaked_controllers.packet.TweakedLinkedControllerInputSyncPacket;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.LinkBehaviour;
@@ -18,6 +20,7 @@ import net.createmod.catnip.data.IntAttached;
 import net.createmod.catnip.data.WorldAttached;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 
 /**
@@ -48,6 +51,9 @@ public class TweakedLinkedControllerServerHandler
     public static WorldAttached<Map<UUID, ArrayList<TweakedManualAxisFrequency>>> receivedAxes =
         new WorldAttached<>($ -> new HashMap<>());
     static final int TIMEOUT = 30;
+    static final int SYNC_RANGE = 64;
+    public static final WorldAttached<Map<UUID, InputSnapshot>> playerInputStates =
+        new WorldAttached<>($ -> new HashMap<>());
 
     public static void tick(LevelAccessor world)
     {
@@ -98,6 +104,15 @@ public class TweakedLinkedControllerServerHandler
             if (list.isEmpty())
                 iterator.remove();
         }
+
+        Map<UUID, InputSnapshot> stateMap = playerInputStates.get(world);
+        for (Iterator<Entry<UUID, InputSnapshot>> iterator = stateMap.entrySet()
+            .iterator(); iterator.hasNext();) {
+            Entry<UUID, InputSnapshot> entry = iterator.next();
+            if (Math.abs(System.currentTimeMillis() - entry.getValue()
+                .timestamp()) > TIMEOUT * 50L)
+                iterator.remove();
+        }
     }
 
     public static void ReceivePressed(LevelAccessor world, BlockPos pos, UUID uniqueID, ArrayList<Couple<Frequency>> collect, ArrayList<Boolean> values)
@@ -133,6 +148,27 @@ public class TweakedLinkedControllerServerHandler
                     AllAdvancements.LINKED_CONTROLLER.awardTo(world.getPlayerByUUID(uniqueID));
         }
     }
+
+    public static void broadcastButtonState(Level world, BlockPos pos, UUID uniqueID, short buttons)
+    {
+        Map<UUID, InputSnapshot> map = playerInputStates.get(world);
+        InputSnapshot prev = map.get(uniqueID);
+        int axis = prev != null ? prev.axis() : 0;
+        InputSnapshot snapshot = new InputSnapshot(buttons, axis, System.currentTimeMillis());
+        map.put(uniqueID, snapshot);
+        ModPackets.sendToNear(world, pos, SYNC_RANGE, new TweakedLinkedControllerInputSyncPacket(uniqueID, buttons, axis));
+    }
+
+    public static void broadcastAxisState(Level world, BlockPos pos, UUID uniqueID, int axis)
+    {
+        Map<UUID, InputSnapshot> map = playerInputStates.get(world);
+        InputSnapshot prev = map.get(uniqueID);
+        short buttons = prev != null ? prev.buttons() : 0;
+        InputSnapshot snapshot = new InputSnapshot(buttons, axis, System.currentTimeMillis());
+        map.put(uniqueID, snapshot);
+        ModPackets.sendToNear(world, pos, SYNC_RANGE, new TweakedLinkedControllerInputSyncPacket(uniqueID, buttons, axis));
+    }
+
 
     public static void ReceiveAxis(LevelAccessor world, BlockPos pos, UUID uniqueID, ArrayList<Couple<Frequency>> collect, ArrayList<Byte> values)
         {

@@ -47,7 +47,7 @@ public class TweakedLecternControllerRenderer extends SafeBlockEntityRenderer<Tw
             .getModel(stack, be.getLevel(), null, 0);
         PartialItemModelRenderer renderer = PartialItemModelRenderer.of(stack, transformType, ms, buffer, overlay);
         boolean active = be.hasUser();
-        boolean renderDepression = be.isUsedBy(Minecraft.getInstance().player);
+        boolean renderDepression = active;
 
         Direction facing = be.getBlockState().getValue(TweakedLecternControllerBlock.FACING);
         var msr = TransformStack.of(ms);
@@ -57,7 +57,9 @@ public class TweakedLecternControllerRenderer extends SafeBlockEntityRenderer<Tw
         msr.rotateYDegrees(AngleHelper.horizontalAngle(facing) - 90);
         msr.translate(0.28, 0, 0);
         msr.rotateZDegrees(-22.0f);
+        TweakedLinkedControllerItemRenderer.setRenderTarget(be.getUserUUID());
         TweakedLinkedControllerItemRenderer.renderInLectern(stack, mainModel, renderer, transformType, ms, light, active, renderDepression);
+        TweakedLinkedControllerItemRenderer.setRenderTarget(null);
         ms.popPose();
     }
 
