@@ -9,6 +9,16 @@ import net.createmod.catnip.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Visual representation of a joystick in the controller GUI.
+ * <p>
+ * Renders a joystick icon that can be displaced to show stick movement.
+ * Used in both the configuration screen and the frequency configuration screen.
+ *
+ * @see ModControllerConfigScreen
+ * @see TweakedLinkedControllerScreen
+ * @see ModIcons
+ */
 public class JoystickIcon extends AbstractSimiWidget
 {
 

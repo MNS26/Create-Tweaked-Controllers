@@ -4,6 +4,14 @@ package com.getitemfromblock.create_tweaked_controllers.gui;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+/**
+ * Custom inventory slot for the Tweaked Linked Controller's frequency configuration screen.
+ * <p>
+ * Extends NeoForge's {@link SlotItemHandler} with visibility control for the two-page
+ * layout (buttons page vs axes page). Only one page of slots is visible at a time.
+ *
+ * @see TweakedLinkedControllerMenu
+ */
 public class ControllerItemSlot extends SlotItemHandler
 {
     protected boolean active = true;

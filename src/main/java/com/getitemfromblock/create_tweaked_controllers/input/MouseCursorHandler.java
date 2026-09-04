@@ -10,10 +10,32 @@ import net.minecraft.client.MouseHandler;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec2;
 
+/**
+ * Centralized mouse input handler that tracks cursor position, velocity, and scroll.
+ * <p>
+ * Provides two tracking modes for mouse movement:
+ * <ul>
+ *   <li><b>Position mode</b>: cumulative delta from a reference point (for relative controls)</li>
+ *   <li><b>Velocity mode</b>: instantaneous movement speed (for velocity-based controls)</li>
+ * </ul>
+ * Also handles:
+ * <ul>
+ *   <li>Mouse lock for camera control (prevents player look while controller is active)</li>
+ *   <li>Scroll wheel accumulation and cancellation</li>
+ *   <li>Center/reset functionality for returning cursor to a neutral position</li>
+ * </ul>
+ * All values are updated each frame via {@link #Update()}.
+ *
+ * @see MouseAxisInput
+ * @see MouseWheelInput
+ */
 public class MouseCursorHandler
 {
+    /** Cumulative cursor displacement from the reference point. */
     public static Vec2 delta = null;
+    /** Last known cursor position (used to calculate velocity). */
     public static Vec2 lastPos = null;
+    /** Current cursor velocity in pixels/second. */
     public static Vec2 vel = null;
     private static MouseHandler m = null;
     private static double lastMouseEventTime;

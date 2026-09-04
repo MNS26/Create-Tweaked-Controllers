@@ -18,8 +18,30 @@ import com.mojang.blaze3d.platform.InputConstants.Key;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
+/**
+ * Stores and manages the controller input mapping profile.
+ * <p>
+ * A profile maps 25 input slots to physical inputs:
+ * <ul>
+ *   <li>Slots 0-14: 15 button inputs (face buttons, bumpers, d-pad, sticks, triggers)</li>
+ *   <li>Slots 15-24: 10 axis inputs (5 axes x 2 directions each: positive/negative)</li>
+ * </ul>
+ * Profiles are persisted as binary files in {@code config/gamepad_profiles/} with a
+ * versioned format (magic header "CTCPRF"). The version system supports:
+ * <ul>
+ *   <li>Version 1 (unversioned): no device index, no deadzone</li>
+ *   <li>Version 2.0+: per-device joystick addressing</li>
+ *   <li>Version 2.3+: per-axis deadzone support</li>
+ * </ul>
+ * Each profile entry is a {@link GenericInput} implementation that handles its own
+ * serialization and deserialization.
+ *
+ * @see GenericInput
+ * @see TweakedControlsUtil
+ */
 public class ControlProfile
 {
+    /** The 25-slot input layout array: [0-14]=buttons, [15-24]=axes. */
     public GenericInput[] layout = new GenericInput[25];
     public boolean hasJoystickInput = false;
     public boolean hasMouseScroll = false;
@@ -391,7 +413,7 @@ public class ControlProfile
         }
         catch (IOException e)
         {
-            CreateTweakedControllers.error("Error loading controller profile \""+path+"\"!");
+            CreateTweakedControllers.error("Error saving controller profile \""+path+"\"!");
             for (StackTraceElement line : e.getStackTrace())
             {
                 CreateTweakedControllers.error(line.toString());

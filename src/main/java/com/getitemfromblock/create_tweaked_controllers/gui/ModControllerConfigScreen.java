@@ -26,6 +26,23 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 
+/**
+ * Advanced controller configuration screen for custom input mappings.
+ * <p>
+ * Displays a visual representation of a gamepad with interactive buttons and joysticks.
+ * The left side shows an {@link InputList} with all 25 configurable input slots.
+ * Players can bind inputs by:
+ * <ul>
+ *   <li>Clicking an input slot, then pressing a keyboard key or mouse button</li>
+ *   <li>Clicking an input slot, then moving a joystick axis</li>
+ *   <li>Clicking an input slot, then moving the mouse (for mouse axis binding)</li>
+ *   <li>Clicking an input slot, then scrolling the mouse wheel</li>
+ * </ul>
+ * Includes save/load/reset buttons and live preview of controller state.
+ *
+ * @see InputList
+ * @see ModConfigScreen
+ */
 public class ModControllerConfigScreen extends AbstractSimiScreen
 {
     protected final Screen parent;
@@ -42,7 +59,7 @@ public class ModControllerConfigScreen extends AbstractSimiScreen
     // Number of frames to ignore mouse inputs right after starting to bind an input,
     // so that the initial mouse click/movement that opens binding isn't captured.
     private int bindDelay = 0;
-    private static final int BIND_DELAY_FRAMES = 16;
+    private static final int BIND_DELAY_FRAMES = 32;
 
     public ModControllerConfigScreen(Screen p)
     {

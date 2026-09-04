@@ -11,6 +11,22 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import net.minecraft.world.entity.player.Player;
 
+/**
+ * CC:Tweaked peripheral for the Tweaked Lectern Controller block.
+ * <p>
+ * Exposes controller state to Lua programs running on attached computers:
+ * <ul>
+ *   <li>{@code hasUser()} - whether a player is currently using the controller</li>
+ *   <li>{@code getUserUUID()} - UUID of the current user</li>
+ *   <li>{@code getButton(index)} - read button state (1-indexed, range [1,15])</li>
+ *   <li>{@code getAxis(index)} - read axis value (1-indexed, range [1,6])</li>
+ *   <li>{@code setFullPrecision(bool)} - enable/disable float-level axis precision</li>
+ *   <li>{@code isFullPrecision()} - check if full precision mode is active</li>
+ * </ul>
+ * Fires events: {@code controller_start_using} and {@code controller_stop_using}.
+ *
+ * @see TweakedLecternControllerBlockEntity
+ */
 public class TweakedLecternPeripheral extends ModSyncedPeripheral<TweakedLecternControllerBlockEntity>
 {
     public TweakedLecternPeripheral(TweakedLecternControllerBlockEntity be)

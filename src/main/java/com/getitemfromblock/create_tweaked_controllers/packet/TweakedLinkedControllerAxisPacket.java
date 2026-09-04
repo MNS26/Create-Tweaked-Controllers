@@ -20,6 +20,20 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+/**
+ * Packet sent from client to server carrying the current state of all 6 controller axes.
+ * <p>
+ * Supports two precision modes:
+ * <ul>
+ *   <li><b>Standard mode</b>: axes packed into an {@code int} (5 bits for joystick axes, 4 bits for triggers)</li>
+ *   <li><b>Full precision mode</b>: 6 float values sent alongside the packed int (for CC:Tweaked)</li>
+ * </ul>
+ * Full precision is only used when the controller is in a lectern and the user has
+ * enabled it via the CC:Tweaked peripheral API.
+ *
+ * @see TweakedLinkedControllerServerHandler
+ * @see ControllerRedstoneOutput
+ */
 public class TweakedLinkedControllerAxisPacket extends TweakedLinkedControllerPacketBase
 {
     public static final Type<TweakedLinkedControllerAxisPacket> TYPE = new Type<>(

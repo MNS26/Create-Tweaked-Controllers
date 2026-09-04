@@ -41,6 +41,29 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+/**
+ * Client-side handler for the Tweaked Linked Controller.
+ * <p>
+ * Manages the controller's lifecycle on the client through three modes:
+ * <ul>
+ *   <li>{@link Mode#IDLE} - controller is inactive</li>
+ *   <li>{@link Mode#ACTIVE} - controller is actively sending input data to the server</li>
+ *   <li>{@link Mode#BIND} - waiting for the player to press a button/axis to bind to a Redstone Link</li>
+ * </ul>
+ * When active, reads input state via {@link TweakedControlsUtil}, packs it into
+ * button/axis packets, and sends them to the server at a rate-limited cadence
+ * ({@link #PACKET_RATE} ticks between packets). Also handles:
+ * <ul>
+ *   <li>Activation/deactivation via right-click or keybind</li>
+ *   <li>Lectern controller integration</li>
+ *   <li>Bind mode for pairing with Redstone Links</li>
+ *   <li>Overlay rendering for bind mode instructions</li>
+ *   <li>Sound effects for button presses</li>
+ * </ul>
+ *
+ * @see TweakedLinkedControllerServerHandler
+ * @see TweakedControlsUtil
+ */
 public class TweakedLinkedControllerClientHandler
 {
 

@@ -16,6 +16,19 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
+/**
+ * Client-side event handlers for the mod.
+ * <p>
+ * Handles:
+ * <ul>
+ *   <li>Client tick (HIGHEST priority): runs {@link TweakedLinkedControllerClientHandler#tick()}
+ *       to process inputs and send packets</li>
+ *   <li>Mouse scroll events: captures scroll delta and optionally cancels vanilla scroll
+ *       when mouse is locked by the controller</li>
+ *   <li>Render frame pre-event: cancels player camera rotation when mouse lock is active</li>
+ *   <li>Mod bus events: registers config screen factory and GUI overlay layer</li>
+ * </ul>
+ */
 @EventBusSubscriber(modid = CreateTweakedControllers.ID, value = Dist.CLIENT)
 public class ModClientEvents
 {

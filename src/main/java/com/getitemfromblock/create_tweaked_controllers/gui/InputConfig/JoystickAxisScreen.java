@@ -9,6 +9,20 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Configuration screen for joystick axis inputs.
+ * <p>
+ * Provides editable fields for:
+ * <ul>
+ *   <li>Minimum bound (lower threshold for normalization)</li>
+ *   <li>Maximum bound (upper threshold for normalization)</li>
+ *   <li>Deadzone threshold (values below this are treated as zero)</li>
+ * </ul>
+ * Also shows a live preview of the raw axis value for testing.
+ *
+ * @see JoystickAxisInput
+ * @see GenericInputScreen
+ */
 public class JoystickAxisScreen extends GenericInputScreen
 {
     public JoystickAxisInput source;

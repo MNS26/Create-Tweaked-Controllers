@@ -9,8 +9,28 @@ import java.util.Vector;
 
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Low-level GLFW joystick polling system that reads raw button and axis states.
+ * <p>
+ * Supports up to 16 joystick devices simultaneously. Each device's state is tracked
+ * independently, including both current and "stored" values (used by the binding UI
+ * to detect changes). The system auto-selects a primary device for backwards-compatible
+ * single-device API calls.
+ * <p>
+ * Key operations:
+ * <ul>
+ *   <li>{@link #GetControls()} - polls all connected joysticks and updates state</li>
+ *   <li>{@link #GetButton(int, int)} / {@link #GetAxis(int, int)} - read device state</li>
+ *   <li>{@link #StoreAxisValues(int)} / {@link #GetFirstAxis(int)} - change detection for binding UI</li>
+ * </ul>
+ *
+ * @see GamepadInputs
+ * @see JoystickAxisInput
+ * @see JoystickButtonInput
+ */
 public class JoystickInputs
 {
+    /** Internal state container for a single joystick device. */
     private static class DeviceState
     {
         Vector<Boolean> buttons = new Vector<>(0);
@@ -19,6 +39,7 @@ public class JoystickInputs
         Vector<Float> storedAxis = new Vector<>(0);
     }
 
+    /** Maximum number of joystick devices that can be tracked simultaneously. */
     private static final int MAX_JOYSTICKS = 16;
     private static final DeviceState[] devices = new DeviceState[MAX_JOYSTICKS];
     private static final List<Integer> presentDevices = new ArrayList<>();

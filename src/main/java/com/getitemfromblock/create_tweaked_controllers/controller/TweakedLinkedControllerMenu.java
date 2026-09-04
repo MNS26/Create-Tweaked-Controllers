@@ -13,6 +13,20 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+/**
+ * Server-side menu/container for the Tweaked Linked Controller's frequency configuration screen.
+ * <p>
+ * Extends Create's {@link GhostItemMenu} to provide a two-page interface:
+ * <ul>
+ *   <li><b>Page 1</b>: 15 button frequency slots (30 items, 2 per button for the frequency pair)</li>
+ *   <li><b>Page 2</b>: 10 axis frequency slots (20 items, 2 per axis for the frequency pair)</li>
+ * </ul>
+ * Each frequency slot accepts a Redstone Link frequency item. The menu is opened
+ * via shift+right-click on the controller item.
+ *
+ * @see TweakedLinkedControllerScreen
+ * @see TweakedLinkedControllerItem
+ */
 public class TweakedLinkedControllerMenu extends GhostItemMenu<ItemStack>
 {
     private boolean isSecondPage = false;

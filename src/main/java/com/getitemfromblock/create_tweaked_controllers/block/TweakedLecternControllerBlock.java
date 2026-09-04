@@ -23,6 +23,23 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
+/**
+ * Block implementation for the Tweaked Lectern Controller.
+ * <p>
+ * Extends Minecraft's {@link LecternBlock} to create a functional lectern that
+ * holds and operates a Tweaked Linked Controller. Features:
+ * <ul>
+ *   <li>Converts a vanilla lectern when a controller item is placed on it</li>
+ *   <li>Reverts to a vanilla lectern when shift-right-clicked (drops the controller)</li>
+ *   <li>Allows players to interact with the controller by right-clicking</li>
+ *   <li>Drops the controller item when broken</li>
+ *   <li>Emits a comparator signal of 15</li>
+ * </ul>
+ * Uses Create's IBE (In-BlockEntity) pattern for block entity integration.
+ *
+ * @see TweakedLecternControllerBlockEntity
+ * @see TweakedLinkedControllerItem
+ */
 public class TweakedLecternControllerBlock extends LecternBlock
     implements IBE<TweakedLecternControllerBlockEntity>, SpecialBlockItemRequirement
 {

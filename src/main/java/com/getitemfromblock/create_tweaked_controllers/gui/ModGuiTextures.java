@@ -8,6 +8,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+/**
+ * Enum of all GUI texture sprites used by the mod.
+ * <p>
+ * Each entry defines a texture location, dimensions, and optional source region.
+ * Textures are stored in {@code textures/gui/} and rendered via blitting.
+ *
+ * @see ModControllerConfigScreen
+ * @see TweakedLinkedControllerScreen
+ */
 public enum ModGuiTextures implements ScreenElement
 {
     TWEAKED_LINKED_CONTROLLER_0("tweaked_linked_controller_0", 227, 172),

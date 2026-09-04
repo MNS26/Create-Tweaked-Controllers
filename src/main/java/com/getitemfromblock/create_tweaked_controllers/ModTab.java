@@ -11,6 +11,12 @@ import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+/**
+ * Registers the mod's creative mode tab.
+ * <p>
+ * The tab appears in the creative inventory and contains all mod items
+ * (currently just the Tweaked Linked Controller).
+ */
 public class ModTab
 {
     private static final DeferredRegister<CreativeModeTab> TAB =

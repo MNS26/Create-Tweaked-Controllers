@@ -8,9 +8,26 @@ import com.getitemfromblock.create_tweaked_controllers.config.ModClientConfig;
 
 import net.minecraft.network.chat.Component;
 
+/**
+ * High-level gamepad input system using GLFW's standardized gamepad API.
+ * <p>
+ * Unlike {@link JoystickInputs} which provides raw joystick access, this class
+ * uses GLFW's gamepad mapping to provide a standardized layout (15 buttons, 6 axes)
+ * compatible with Xbox, PlayStation, and Nintendo controllers. Auto-detects and
+ * selects a connected gamepad, preferring one with recent button activity.
+ * <p>
+ * The 6 axes are: Left Stick X/Y, Right Stick X/Y, Left Trigger, Right Trigger.
+ * The 15 buttons follow the standard gamepad layout (A/B/X/Y, bumpers, triggers,
+ * sticks, d-pad, start/select/home).
+ *
+ * @see JoystickInputs
+ * @see ModClientConfig#CONTROLLER_LAYOUT_TYPE
+ */
 public class GamepadInputs
 {
+    /** Standard gamepad button states (15 buttons: face, bumpers, triggers, sticks, d-pad, special). */
     static final public boolean buttons[] = new boolean[15];
+    /** Standard gamepad axis values (6 axes: LX, LY, RX,RY, LT, RT). Range: -1.0 to 1.0. */
     static final public float axis[] = new float[6];
 
     protected static GLFWGamepadState state = null;

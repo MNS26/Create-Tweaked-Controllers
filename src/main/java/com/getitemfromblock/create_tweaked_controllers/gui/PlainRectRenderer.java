@@ -25,6 +25,14 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+/**
+ * Renders a solid-colored rectangle using a 1x1 pixel from the button atlas texture.
+ * <p>
+ * Used by {@link PlainRect} to draw trigger axis bars and other colored rectangles
+ * in the controller configuration screen. Supports arbitrary dimensions via UV scaling.
+ *
+ * @see PlainRect
+ */
 public class PlainRectRenderer implements ScreenElement
 {
     public static final ResourceLocation BUTTON_ATLAS = CreateTweakedControllers.asResource("textures/gui/controller_buttons.png");

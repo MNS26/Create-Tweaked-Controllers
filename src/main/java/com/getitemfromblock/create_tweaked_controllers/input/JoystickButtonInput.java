@@ -12,10 +12,25 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+/**
+ * Joystick button input implementation for the controller mapping system.
+ * <p>
+ * Reads digital button states from a GLFW joystick device. Supports:
+ * <ul>
+ *   <li>Per-device addressing via {@link #deviceIndex}</li>
+ *   <li>Invert option to reverse the button state (useful for normally-closed switches)</li>
+ * </ul>
+ * When used as an axis, returns 1.0 when pressed and 0.0 when released.
+ *
+ * @see JoystickInputs
+ */
 public class JoystickButtonInput implements GenericInput
 {
+    /** The button index within the joystick device (e.g. 0-14 for typical gamepads). */
     public int buttonID = -1;
+    /** If true, the button state is inverted (pressed = false, released = true). */
     public boolean invertValue = false;
+    /** Index of the joystick device (0-15). */
     public int deviceIndex = 0;
     // Transient: used during deserialization to decide whether the stream carries a device
     // index (new profiles do; legacy ones don't). Never written to disk directly.

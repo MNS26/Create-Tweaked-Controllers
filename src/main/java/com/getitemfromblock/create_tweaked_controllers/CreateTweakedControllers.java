@@ -25,10 +25,26 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 
+/**
+ * Main mod entry point for Create: Tweaked Controllers.
+ * <p>
+ * A Create mod addon that lets players control Create contraptions via Redstone Links
+ * using physical gamepads, keyboard+mouse, or custom joystick inputs. Provides the
+ * "Tweaked Linked Controller" item and the "Tweaked Lectern Controller" block.
+ * <p>
+ * Responsibilities:
+ * <ul>
+ *   <li>Registers all mod components (items, blocks, block entities, packets, config, menus)</li>
+ *   <li>Initializes the CC:Tweaked integration if present</li>
+ *   <li>Provides utility methods for translation and resource locations</li>
+ * </ul>
+ */
 @Mod(CreateTweakedControllers.ID)
 public class CreateTweakedControllers
 {
+    /** Mod ID used throughout the codebase for resource locations and registry keys. */
     public static final String ID = "create_tweaked_controllers";
+    /** Human-readable mod name used for creative tab and display. */
     public static final String NAME = "Create: Tweaked Controllers";
 
     private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(ID)
@@ -36,7 +52,7 @@ public class CreateTweakedControllers
             .setTooltipModifierFactory(item ->
                     new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
                             .andThen(TooltipModifier.mapNull(KineticStats.create(item)))
-            );;
+            );
 
     public CreateTweakedControllers(IEventBus eventBus, ModContainer container)
     {

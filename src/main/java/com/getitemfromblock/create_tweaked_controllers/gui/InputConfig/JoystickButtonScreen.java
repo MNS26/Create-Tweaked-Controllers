@@ -8,6 +8,13 @@ import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Configuration screen for joystick button inputs.
+ * <p>
+ * Provides a single "Invert" checkbox that reverses the button state.
+ *
+ * @see JoystickButtonInput
+ */
 public class JoystickButtonScreen extends GenericInputScreen
 {
     public JoystickButtonInput source;

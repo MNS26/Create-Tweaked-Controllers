@@ -13,9 +13,17 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+/**
+ * Mouse button input implementation for the controller mapping system.
+ * <p>
+ * Reads mouse button states using Create's AllKeys utility. Supports invert option.
+ * When used as an axis, returns 1.0 when pressed and 0.0 when released.
+ */
 public class MouseButtonInput implements GenericInput
 {
+    /** Mouse button index (0 = left, 1 = right, 2 = middle, etc.). -1 means unbound. */
     public int buttonID = -1;
+    /** If true, the button state is inverted. */
     public boolean invertValue = false;
 
     public MouseButtonInput(int button)

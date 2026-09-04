@@ -27,6 +27,24 @@ import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+/**
+ * Scrollable list widget displaying all 25 configurable input slots.
+ * <p>
+ * Organized into two sections:
+ * <ul>
+ *   <li><b>Buttons</b> (slots 0-14): 15 gamepad button bindings</li>
+ *   <li><b>Axes</b> (slots 15-24): 10 axis bindings (5 axes x 2 directions)</li>
+ * </ul>
+ * Each entry shows the input name, current binding (or "None"), and provides:
+ * <ul>
+ *   <li>Change button: starts bind mode to reassign the input</li>
+ *   <li>Reset button: clears the binding</li>
+ *   <li>Config button: opens per-input configuration screen</li>
+ * </ul>
+ *
+ * @see ModControllerConfigScreen
+ * @see GenericInputScreen
+ */
 @OnlyIn(Dist.CLIENT)
 public class InputList extends ContainerObjectSelectionList<InputList.Entry>
 {

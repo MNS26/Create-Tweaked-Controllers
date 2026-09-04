@@ -11,6 +11,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Packet sent from client to server to notify that the player stopped using a lectern controller.
+ * <p>
+ * Sent when the player deactivates the controller while in lectern mode (e.g. by pressing
+ * ESC, switching items, or opening a screen). On the server, triggers
+ * {@link TweakedLecternControllerBlockEntity#tryStopUsing(Player)} to release the
+ * lectern and clean up the user state.
+ */
 public class TweakedLinkedControllerStopLecternPacket extends TweakedLinkedControllerPacketBase
 {
     public static final Type<TweakedLinkedControllerStopLecternPacket> TYPE = new Type<>(

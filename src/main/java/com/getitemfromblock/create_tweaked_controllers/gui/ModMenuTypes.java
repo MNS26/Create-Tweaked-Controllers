@@ -12,6 +12,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
+/**
+ * Registry for container menu types and their associated screens.
+ * <p>
+ * Registers the {@link TweakedLinkedControllerMenu} with its screen factory
+ * using Create's Registrate system.
+ */
 public class ModMenuTypes
 {
     private static final

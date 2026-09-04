@@ -12,6 +12,19 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+/**
+ * Registry and dispatcher for all network packets used by the mod.
+ * <p>
+ * All packets are client-to-server (play-to-server) and use NeoForge's payload system.
+ * The four packet types are:
+ * <ul>
+ *   <li>{@link TweakedLinkedControllerButtonPacket} - packed button states (short)</li>
+ *   <li>{@link TweakedLinkedControllerAxisPacket} - packed or full-precision axis states</li>
+ *   <li>{@link TweakedLinkedControllerBindPacket} - bind a controller input to a Redstone Link</li>
+ *   <li>{@link TweakedLinkedControllerStopLecternPacket} - notify server the player stopped using lectern</li>
+ * </ul>
+ * Uses a versioned network protocol (version "2") to ensure client/server compatibility.
+ */
 public class ModPackets
 {
     public static final String NETWORK_VERSION = "2";

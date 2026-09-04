@@ -7,6 +7,23 @@ import com.getitemfromblock.create_tweaked_controllers.input.JoystickInputs;
 import com.getitemfromblock.create_tweaked_controllers.input.MouseCursorHandler;
 import com.simibubi.create.foundation.utility.ControlsUtil;
 
+/**
+ * Central controller input processing utility.
+ * <p>
+ * Bridges physical input devices to the controller output system. Two modes:
+ * <ul>
+ *   <li><b>Custom mappings mode</b>: reads raw joystick inputs via {@link JoystickInputs},
+ *       processes them through the {@link ControlProfile} layout, suppresses duplicated
+ *       Minecraft keybinds, and fills the gamepad input arrays</li>
+ *   <li><b>Default mode</b>: reads standardized gamepad inputs via {@link GamepadInputs}
+ *       and directly fills the gamepad input arrays</li>
+ * </ul>
+ * Also manages mouse focus (lock/unlock) for camera control integration.
+ *
+ * @see GamepadInputs
+ * @see JoystickInputs
+ * @see ControlProfile
+ */
 public class TweakedControlsUtil
 {
     public static ControlProfile profile = new ControlProfile();

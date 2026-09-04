@@ -1,5 +1,19 @@
 package com.getitemfromblock.create_tweaked_controllers.controller;
 
+/**
+ * Encodes/decodes controller button and axis states for network transmission.
+ * <p>
+ * Button states are packed into a {@code short} (15 bits, one per button).
+ * Axis states are packed into an {@code int}:
+ * <ul>
+ *   <li>Joystick axes (0-3): 5 bits each (1 sign + 4 value bits), supporting values -15 to +15</li>
+ *   <li>Trigger axes (4-5): 4 bits each, supporting values 0 to 15</li>
+ * </ul>
+ * Also stores full-precision float axis values for lectern/CC:Tweaked mode.
+ *
+ * @see TweakedLinkedControllerButtonPacket
+ * @see TweakedLinkedControllerAxisPacket
+ */
 public class ControllerRedstoneOutput
 {
     public Boolean[] buttons = new Boolean[15];

@@ -15,6 +15,26 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.components.EditBox;
 
+/**
+ * Abstract base screen for per-input configuration.
+ * <p>
+ * Provides a common layout with:
+ * <ul>
+ *   <li>Input name and current binding display at the top</li>
+ *   <li>Live output preview showing button (True/False) and axis (0.000-1.000) values</li>
+ *   <li>Subclass-specific configuration controls (bounds, deadzone, invert, etc.)</li>
+ *   <li>Done button to return to the parent screen</li>
+ * </ul>
+ * Output values are color-coded: green for active/True, red for inactive/False,
+ * and a gradient from green to red for axis values.
+ *
+ * @see JoystickAxisScreen
+ * @see KeyboardInputScreen
+ * @see MouseAxisScreen
+ * @see MouseButtonScreen
+ * @see MouseWheelScreen
+ * @see JoystickButtonScreen
+ */
 public abstract class GenericInputScreen extends AbstractSimiScreen
 {
     protected final Screen parent;

@@ -32,6 +32,24 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.loading.FMLEnvironment;
 
+/**
+ * Block entity for the Tweaked Lectern Controller.
+ * <p>
+ * Stores the controller item data and manages player interaction state. Features:
+ * <ul>
+ *   <li>Tracks which player is currently using the controller (one user at a time)</li>
+ *   <li>Receives button/axis state updates from the controlling player's client</li>
+ *   <li>Provides redstone output via frequency items bound to the controller</li>
+ *   <li>Supports full-precision mode for float-level axis values (used by CC:Tweaked)</li>
+ *   <li>Handles controller item storage, swapping, and dropping</li>
+ *   <li>Integrates with CC:Tweaked peripherals for Lua scripting access</li>
+ * </ul>
+ * User tracking uses persistent data tags and range checks to automatically
+ * disconnect players who move too far away.
+ *
+ * @see TweakedLecternControllerBlock
+ * @see TweakedLinkedControllerServerHandler
+ */
 public class TweakedLecternControllerBlockEntity extends SmartBlockEntity
 {
     private ItemContainerContents controllerData = ItemContainerContents.EMPTY;

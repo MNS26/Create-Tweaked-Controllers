@@ -20,6 +20,27 @@ import net.createmod.catnip.data.WorldAttached;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 
+/**
+ * Server-side handler for the Tweaked Linked Controller.
+ * <p>
+ * Receives button and axis state updates from clients and injects them into
+ * Create's Redstone Link network as virtual {@link IRedstoneLinkable} entries.
+ * <p>
+ * Maintains per-player collections of active frequency entries:
+ * <ul>
+ *   <li>{@link TweakedManualFrequency} - binary on/off signals (button states)</li>
+ *   <li>{@link TweakedManualAxisFrequency} - analog signal strength (axis values, 0-15)</li>
+ * </ul>
+ * Each entry has a timeout ({@link #TIMEOUT} ticks) and is automatically removed
+ * from the network when it expires. Entries are refreshed each time a new packet
+ * arrives from the client.
+ * <p>
+ * This handler is ticked every server tick via {@link ModCommonEvents}.
+ *
+ * @see TweakedLinkedControllerClientHandler
+ * @see TweakedLinkedControllerButtonPacket
+ * @see TweakedLinkedControllerAxisPacket
+ */
 public class TweakedLinkedControllerServerHandler
 {
     public static WorldAttached<Map<UUID, Collection<TweakedManualFrequency>>> receivedInputs =

@@ -15,6 +15,16 @@ import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.fml.config.ModConfig;
 
+/**
+ * Main configuration screen for the mod, accessible from the mods list.
+ * <p>
+ * Provides buttons for:
+ * <ul>
+ *   <li>General config (opens NeoForge config screen)</li>
+ *   <li>Controller config (opens {@link ModControllerConfigScreen}, only when custom mappings enabled)</li>
+ *   <li>Wiki and issue tracker links</li>
+ * </ul>
+ */
 public class ModConfigScreen extends AbstractSimiScreen
 {
     protected final Screen parent;

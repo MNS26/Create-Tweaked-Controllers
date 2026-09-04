@@ -11,6 +11,24 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+/**
+ * Abstract base class for all Tweaked Linked Controller network packets.
+ * <p>
+ * Handles the common packet structure:
+ * <ul>
+ *   <li>A flag byte encoding whether the packet targets a lectern and uses full precision</li>
+ *   <li>An optional lectern block position (3 ints) if targeting a lectern controller</li>
+ *   <li>Subclass-specific payload data</li>
+ * </ul>
+ * The {@link #handle(IPayloadContext)} method dispatches to either
+ * {@link #handleItem(ServerPlayer, ItemStack)} (for handheld controller) or
+ * {@link #handleLectern(ServerPlayer, TweakedLecternControllerBlockEntity)} (for lectern).
+ *
+ * @see TweakedLinkedControllerButtonPacket
+ * @see TweakedLinkedControllerAxisPacket
+ * @see TweakedLinkedControllerBindPacket
+ * @see TweakedLinkedControllerStopLecternPacket
+ */
 public abstract class TweakedLinkedControllerPacketBase implements CustomPacketPayload
 {
     protected final BlockPos lecternPos;

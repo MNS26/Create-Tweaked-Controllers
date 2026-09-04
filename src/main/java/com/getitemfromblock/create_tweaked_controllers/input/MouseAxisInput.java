@@ -12,11 +12,28 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+/**
+ * Mouse axis input implementation for the controller mapping system.
+ * <p>
+ * Tracks mouse cursor position or velocity along the X or Y axis. Supports:
+ * <ul>
+ *   <li>Position mode: tracks cumulative cursor movement</li>
+ *   <li>Velocity mode: tracks instantaneous cursor speed</li>
+ *   <li>Configurable min/max bounds for normalizing the output</li>
+ * </ul>
+ * Used for camera-like controls where mouse movement maps to analog axes.
+ *
+ * @see MouseCursorHandler
+ */
 public class MouseAxisInput implements GenericInput
 {
+    /** If true, uses mouse velocity instead of cumulative position. */
     public boolean useVelocity = false;
+    /** If true, tracks the Y axis; if false, tracks the X axis. */
     public boolean isYAxis = false;
+    /** Minimum bound for normalization. */
     public float minBound = 0.0f;
+    /** Maximum bound for normalization. */
     public float maxBound = 1000.0f;
 
     public MouseAxisInput(boolean axis, float min, float max, boolean useVel)

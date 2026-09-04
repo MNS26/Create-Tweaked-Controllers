@@ -18,6 +18,16 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
+/**
+ * Spritesheet renderer for gamepad button icons.
+ * <p>
+ * Provides button glyphs (d-pad, face buttons, bumpers, triggers, sticks, special)
+ * from a 64x64 atlas texture. Each button is 8x8 pixels. Supports Xbox, PlayStation,
+ * and Nintendo button symbol variants.
+ *
+ * @see ControllerButton
+ * @see ModControllerConfigScreen
+ */
 public class ControllerButtonRenderer implements ScreenElement
 {
     public static final ResourceLocation BUTTON_ATLAS = CreateTweakedControllers.asResource("textures/gui/controller_buttons.png");

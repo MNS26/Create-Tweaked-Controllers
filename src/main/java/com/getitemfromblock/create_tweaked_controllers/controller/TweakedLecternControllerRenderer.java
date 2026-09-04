@@ -18,6 +18,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Block entity renderer for the Tweaked Lectern Controller.
+ * <p>
+ * Renders the controller item model on top of the lectern block, positioned and
+ * rotated to match the lectern's facing direction. Shows the controller in its
+ * active or inactive state depending on whether a player is using it.
+ *
+ * @see TweakedLecternControllerBlockEntity
+ * @see TweakedLinkedControllerItemRenderer
+ */
 public class TweakedLecternControllerRenderer extends SafeBlockEntityRenderer<TweakedLecternControllerBlockEntity>
 {
 

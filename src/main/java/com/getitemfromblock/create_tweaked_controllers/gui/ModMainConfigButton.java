@@ -28,6 +28,13 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Config button that appears on the main menu and in-game pause menu.
+ * <p>
+ * Renders a small controller icon and opens {@link ModConfigScreen} when clicked.
+ * Position is configurable via {@link ModClientConfig} options for row and offset.
+ * Uses an event subscriber to inject itself into existing menu button layouts.
+ */
 public class ModMainConfigButton extends Button
 {
     public static final ItemStack ICON = ModItems.TWEAKED_LINKED_CONTROLLER.asStack(); // TODO maybe put an icon

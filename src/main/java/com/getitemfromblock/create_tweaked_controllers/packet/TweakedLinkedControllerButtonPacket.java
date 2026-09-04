@@ -20,6 +20,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+/**
+ * Packet sent from client to server carrying the current state of all 15 controller buttons.
+ * <p>
+ * Buttons are packed into a {@code short} where each bit represents one button.
+ * On the server, the packet handler:
+ * <ul>
+ *   <li>Decodes the button states</li>
+ *   <li>Looks up the frequency pair for each button from the controller item</li>
+ *   <li>Sends the states to {@link TweakedLinkedControllerServerHandler} for Redstone Link injection</li>
+ * </ul>
+ * Also stores the button states in the lectern block entity when used in lectern mode.
+ */
 public class TweakedLinkedControllerButtonPacket extends TweakedLinkedControllerPacketBase
 {
     public static final Type<TweakedLinkedControllerButtonPacket> TYPE = new Type<>(

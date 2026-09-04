@@ -12,12 +12,32 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+/**
+ * Joystick axis input implementation for the controller mapping system.
+ * <p>
+ * Reads analog axis values from a GLFW joystick device. Supports:
+ * <ul>
+ *   <li>Per-device addressing via {@link #deviceIndex} (supports up to 16 devices)</li>
+ *   <li>Configurable min/max bounds for normalizing the raw axis range</li>
+ *   <li>A deadzone threshold to filter out noise from resting stick positions</li>
+ * </ul>
+ * The raw axis value (typically -1.0 to 1.0) is mapped through the bounds to produce
+ * a 0.0-1.0 output, with values below the deadzone treated as zero.
+ *
+ * @see JoystickInputs
+ * @see JoystickAxisScreen
+ */
 public class JoystickAxisInput implements GenericInput
 {
+    /** The axis index within the joystick device (e.g. 0-5 for typical gamepads). */
     public int axisID = -1;
+    /** Minimum bound for axis normalization. Values at or below this map to 0.0. */
     public float minBound = 0.0f;
+    /** Maximum bound for axis normalization. Values at or above this map to 1.0. */
     public float maxBound = 1.0f;
+    /** Deadzone threshold: raw axis values with absolute value below this are treated as zero. */
     public float deadzone = 0.0f;
+    /** Index of the joystick device (0-15). Multiple controllers can be addressed independently. */
     public int deviceIndex = 0;
     // Transient: used during deserialization to decide whether the stream carries a device
     // index (new profiles do; legacy ones don't). Never written to disk directly.

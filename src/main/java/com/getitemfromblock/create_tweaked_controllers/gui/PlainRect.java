@@ -10,6 +10,16 @@ import net.createmod.catnip.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Interpolating rectangle widget used for trigger axis visualization.
+ * <p>
+ * Renders a colored rectangle that can smoothly transition between two positions/sizes
+ * based on a float value (0.0 to 1.0). Used to show trigger pull depth in the
+ * controller configuration screen.
+ *
+ * @see PlainRectRenderer
+ * @see ModControllerConfigScreen
+ */
 public class PlainRect extends AbstractSimiWidget
 {
     public Vector3f color;

@@ -35,8 +35,25 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+/**
+ * The main controller item that bridges physical inputs to Create's Redstone Link network.
+ * <p>
+ * This item stores 50 frequency items (25 inputs x 2 frequencies each) and provides:
+ * <ul>
+ *   <li><b>Right-click</b>: toggles the controller active/inactive</li>
+ *   <li><b>Shift+right-click</b>: opens the frequency configuration screen</li>
+ *   <li><b>Right-click on Redstone Link</b>: enters bind mode to pair a button/axis</li>
+ *   <li><b>Right-click on vanilla Lectern</b>: places controller into a new Tweaked Lectern Controller block</li>
+ * </ul>
+ * The controller can be used in-hand or placed in a lectern for a more immersive experience.
+ * Uses NeoForge's data component system for persistent storage.
+ *
+ * @see TweakedLinkedControllerClientHandler
+ * @see TweakedLecternControllerBlock
+ */
 public class TweakedLinkedControllerItem extends Item implements MenuProvider
 {
+    /** Total number of frequency item slots: 15 buttons + 10 axes = 25 inputs, 2 slots each. */
     public static final int FREQUENCY_SLOTS = 50;
 
     public TweakedLinkedControllerItem(Properties properties)

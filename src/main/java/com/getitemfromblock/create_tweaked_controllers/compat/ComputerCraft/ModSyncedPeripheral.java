@@ -13,6 +13,16 @@ import net.createmod.catnip.platform.CatnipServices;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 
+/**
+ * Abstract base class for CC:Tweaked peripherals that sync attachment state with the block entity.
+ * <p>
+ * Manages a list of attached computers and notifies the block entity when computers
+ * connect/disconnect. Sends network packets to update the block entity's visual state
+ * (e.g. the "has attached computer" indicator).
+ *
+ * @param <T> the block entity type this peripheral is attached to
+ * @see ModComputerBehavior
+ */
 public abstract class ModSyncedPeripheral<T extends SmartBlockEntity> implements IPeripheral
 {
     protected final T blockEntity;

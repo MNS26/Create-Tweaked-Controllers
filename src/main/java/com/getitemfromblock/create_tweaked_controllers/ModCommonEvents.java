@@ -11,6 +11,17 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
+/**
+ * Server-side event handlers for the mod.
+ * <p>
+ * Handles:
+ * <ul>
+ *   <li>Server world tick: advances the {@link TweakedLinkedControllerServerHandler} to
+ *       expire stale frequency entries and update Redstone Link networks</li>
+ *   <li>Entity join world: cleans up any lingering "IsUsingLecternController" tag on player
+ *       respawn (crash recovery)</li>
+ * </ul>
+ */
 @EventBusSubscriber
 public class ModCommonEvents
 {

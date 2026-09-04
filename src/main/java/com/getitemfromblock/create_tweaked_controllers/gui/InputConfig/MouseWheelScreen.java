@@ -9,6 +9,14 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Configuration screen for mouse wheel inputs.
+ * <p>
+ * Provides min/max bound fields for normalizing the scroll delta.
+ * Shows a live preview of the raw scroll value.
+ *
+ * @see MouseWheelInput
+ */
 public class MouseWheelScreen extends GenericInputScreen
 {
     public MouseWheelInput source;
