@@ -122,6 +122,7 @@ public class TweakedLinkedControllerAxisPacket extends TweakedLinkedControllerPa
         if (player.isSpectator())
             return;
 
+        TweakedLinkedControllerServerHandler.broadcastAxisState(world, pos, uniqueID, axis);
         ControllerRedstoneOutput output = new ControllerRedstoneOutput();
         output.DecodeAxis(axis);
         ArrayList<Couple<Frequency>> axisCouples = new ArrayList<>(10);

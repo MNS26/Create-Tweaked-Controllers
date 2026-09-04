@@ -87,6 +87,7 @@ public class TweakedLinkedControllerButtonPacket extends TweakedLinkedController
 
         if (player.isSpectator())
             return;
+        TweakedLinkedControllerServerHandler.broadcastButtonState(world, pos, uniqueID, buttonStates);
         ControllerRedstoneOutput output = new ControllerRedstoneOutput();
         output.DecodeButtons(buttonStates);
         ArrayList<Couple<Frequency>> buttonCouples = new ArrayList<>(15);

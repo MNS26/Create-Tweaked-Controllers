@@ -27,7 +27,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
  */
 public class ModPackets
 {
-    public static final String NETWORK_VERSION = "2";
+    public static final String NETWORK_VERSION = "3";
 
     public static void registerBusListener(IEventBus modEventBus)
     {
@@ -49,6 +49,9 @@ public class ModPackets
         registrar.playToServer(TweakedLinkedControllerStopLecternPacket.TYPE,
             TweakedLinkedControllerStopLecternPacket.STREAM_CODEC,
             TweakedLinkedControllerPacketBase::handle);
+        registrar.playToClient(TweakedLinkedControllerInputSyncPacket.TYPE,
+            TweakedLinkedControllerInputSyncPacket.STREAM_CODEC,
+            (payload, context) -> context.enqueueWork(payload::handle));
     }
 
     public static void sendToServer(CustomPacketPayload payload)

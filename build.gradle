@@ -141,6 +141,9 @@ dependencies {
 
     //MIXINS
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // JADE COMPAT (optional; only used for the LecternProvider fix mixin)
+    compileOnly("curse.maven:jade-324717:8591319")
 }
 
 tasks.withType(ProcessResources).configureEach {

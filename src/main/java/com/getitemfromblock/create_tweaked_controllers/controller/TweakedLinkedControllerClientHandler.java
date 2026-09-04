@@ -1,7 +1,10 @@
 package com.getitemfromblock.create_tweaked_controllers.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import com.simibubi.create.foundation.item.TooltipHelper;
 import net.createmod.catnip.lang.FontHelper;
@@ -73,6 +76,9 @@ public class TweakedLinkedControllerClientHandler
     public static int PACKET_RATE = 5;
     public static short buttonStates = 0;
     public static int axisStates = 0;
+    /** Remote players' input states, keyed by their UUID. Populated by server-to-client sync packets. */
+    public static final Map<UUID, InputSnapshot> remoteInputs = new HashMap<>();
+    private static final long REMOTE_INPUT_TIMEOUT_MS = 2000;
     private static BlockPos lecternPos;
     private static BlockPos selectedLocation = BlockPos.ZERO;
     private static int buttonPacketCooldown = 0;
@@ -147,6 +153,30 @@ public class TweakedLinkedControllerClientHandler
         return lecternPos != null;
     }
 
+    /**
+     * Returns the remote input snapshot for the given player, or an empty snapshot
+     * if no data has been received for them.
+     *
+     * @param playerUUID the player whose input to look up
+     * @return the remote input state, never null
+     */
+    public static InputSnapshot getRemoteInput(UUID playerUUID)
+    {
+        return playerUUID != null ? remoteInputs.getOrDefault(playerUUID, InputSnapshot.EMPTY) : InputSnapshot.EMPTY;
+    }
+
+    /**
+     * Removes remote input snapshots that have not been refreshed within
+     * {@link #REMOTE_INPUT_TIMEOUT_MS}. Called every client tick.
+     */
+    public static void expireRemoteInputs()
+    {
+        long now = System.currentTimeMillis();
+        remoteInputs.entrySet()
+            .removeIf(entry -> now - entry.getValue()
+                .timestamp() > REMOTE_INPUT_TIMEOUT_MS);
+    }
+
     public static void onLecternUserChanged(BlockPos pos, java.util.UUID prevUser, java.util.UUID currentUser)
     {
         java.util.UUID self = Minecraft.getInstance().player.getUUID();
@@ -184,6 +214,7 @@ public class TweakedLinkedControllerClientHandler
 
     public static void tick()
     {
+        expireRemoteInputs();
         TweakedLinkedControllerItemRenderer.earlyTick();
         if (MODE == Mode.IDLE)
             return;

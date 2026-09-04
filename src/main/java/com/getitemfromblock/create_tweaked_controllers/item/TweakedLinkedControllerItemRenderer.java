@@ -1,6 +1,9 @@
 package com.getitemfromblock.create_tweaked_controllers.item;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
@@ -8,6 +11,7 @@ import org.joml.Vector3f;
 
 import com.getitemfromblock.create_tweaked_controllers.CreateTweakedControllers;
 import com.getitemfromblock.create_tweaked_controllers.config.ModClientConfig;
+import com.getitemfromblock.create_tweaked_controllers.controller.InputSnapshot;
 import com.getitemfromblock.create_tweaked_controllers.controller.TweakedLinkedControllerClientHandler;
 import com.getitemfromblock.create_tweaked_controllers.controller.TweakedLinkedControllerClientHandler.Mode;
 import com.getitemfromblock.create_tweaked_controllers.input.GamepadInputs;
@@ -89,6 +93,12 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
     static LerpedFloat equipProgress;
     static ArrayList<LerpedFloat> buttons;
     static ArrayList<LerpedFloat> axis;
+    /** UUID of the player whose inputs should drive the lectern render, or null for local rendering. */
+    static UUID renderTargetPlayerUUID = null;
+    /** Per-player smoothed animation state for remote lectern rendering. */
+    static final Map<UUID, RemoteAnimState> remoteAnimStates = new HashMap<>();
+    /** Set while rendering a remote player's lectern so the draw helpers select remote animation. */
+    private static boolean renderRemote = false;
 
     static
     {
@@ -104,10 +114,60 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
                 .startWithValue(i < 4 ? 0 : -1));
     }
 
+    static class RemoteAnimState
+    {
+        final ArrayList<LerpedFloat> buttons = new ArrayList<>(15);
+        final ArrayList<LerpedFloat> axis = new ArrayList<>(6);
+
+        RemoteAnimState()
+        {
+            for (int i = 0; i < 15; i++)
+                buttons.add(LerpedFloat.linear()
+                    .startWithValue(0));
+            for (int i = 0; i < 6; i++)
+                axis.add(LerpedFloat.linear()
+                    .startWithValue(i < 4 ? 0 : -1));
+        }
+    }
+
+    public static void setRenderTarget(UUID playerUUID)
+    {
+        renderTargetPlayerUUID = playerUUID;
+    }
+
+    public static void updateRemoteAnimation()
+    {
+        if (Minecraft.getInstance().isPaused())
+            return;
+        for (Map.Entry<UUID, InputSnapshot> entry : TweakedLinkedControllerClientHandler.remoteInputs.entrySet())
+        {
+            RemoteAnimState state = remoteAnimStates.computeIfAbsent(entry.getKey(), $ -> new RemoteAnimState());
+            InputSnapshot snapshot = entry.getValue();
+            if (snapshot == null)
+                continue;
+            for (int i = 0; i < state.buttons.size(); i++)
+            {
+                LerpedFloat lerpedFloat = state.buttons.get(i);
+                lerpedFloat.chase(snapshot.getButton(i) ? 1 : 0, .4f, Chaser.EXP);
+                lerpedFloat.tickChaser();
+            }
+            for (int i = 0; i < state.axis.size(); i++)
+            {
+                LerpedFloat lerpedFloat = state.axis.get(i);
+                lerpedFloat.chase(snapshot.getAxisValue(i), 1.0f, Chaser.LINEAR);
+                lerpedFloat.tickChaser();
+            }
+        }
+        remoteAnimStates.keySet()
+            .removeIf(uuid -> !TweakedLinkedControllerClientHandler.remoteInputs.containsKey(uuid));
+    }
+
     public static void earlyTick()
     {
         if (Minecraft.getInstance().isPaused())
             return;
+
+        updateRemoteAnimation();
 
         boolean active = TweakedLinkedControllerClientHandler.MODE != Mode.IDLE;
         equipProgress.chase(active ? 1 : 0, .2f, Chaser.EXP);
@@ -199,6 +259,8 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
         ms.pushPose();
 
         Minecraft mc = Minecraft.getInstance();
+        renderRemote = renderType == RenderType.LECTERN && renderTargetPlayerUUID != null
+            && (mc.player == null || !renderTargetPlayerUUID.equals(mc.player.getUUID()));
         if (renderType == RenderType.NORMAL && mc.player != null)
         {
             boolean rightHanded = mc.options.mainHand().get() == HumanoidArm.RIGHT;
@@ -302,13 +364,35 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
         ms.popPose();
     }
 
+    protected static LerpedFloat buttonAnim(int index)
+    {
+        if (renderRemote && renderTargetPlayerUUID != null)
+        {
+            RemoteAnimState state = remoteAnimStates.get(renderTargetPlayerUUID);
+            if (state != null)
+                return state.buttons.get(index);
+        }
+        return buttons.get(index);
+    }
+
+    protected static LerpedFloat axisAnim(int index)
+    {
+        if (renderRemote && renderTargetPlayerUUID != null)
+        {
+            RemoteAnimState state = remoteAnimStates.get(renderTargetPlayerUUID);
+            if (state != null)
+                return state.axis.get(index);
+        }
+        return axis.get(index);
+    }
+
     protected static void renderButton(PartialItemModelRenderer renderer, PoseStack ms, int light, float pt, BakedModel button,
         float b, int index, boolean renderDepression, boolean isSideway)
         {
             ms.pushPose();
             if (renderDepression)
             {
-                float depression = b * buttons.get(index).getValue(pt);
+                float depression = b * buttonAnim(index).getValue(pt);
                 if (isSideway)
                 {
                     ms.translate(-depression, 0, 0);
@@ -327,7 +411,7 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
             ms.pushPose();
             final float delta = 1 / 16f * -0.75f;
             Vec3 pos = positionList[isRight ? 12 : 11];
-            float value = axis.get(isRight ? 5 : 4).getValue(pt);
+            float value = axisAnim(isRight ? 5 : 4).getValue(pt);
             value = (value + 1) / 2 * delta;
             ms.translate(pos.x - value, pos.y, pos.z);
             renderer.renderSolid(trigger, light);
@@ -345,13 +429,13 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
             float x, y;
             if (isRight)
             {
-                x = axis.get(2).getValue(pt);
-                y = axis.get(3).getValue(pt);
+                x = axisAnim(2).getValue(pt);
+                y = axisAnim(3).getValue(pt);
             }
             else
             {
-                x = axis.get(0).getValue(pt);
-                y = axis.get(1).getValue(pt);
+                x = axisAnim(0).getValue(pt);
+                y = axisAnim(1).getValue(pt);
             }
             Vector3f ax = new Vector3f(-x, 0, -y);
             double angle = x * x + y * y;
@@ -365,7 +449,7 @@ public class TweakedLinkedControllerItemRenderer extends CustomRenderedItemModel
             ms.mulPose(new Quaternionf(new AxisAngle4f((float)angle, ax)));
             if (renderDepression)
             {
-                float depression = b * buttons.get(isRight ? 10 : 9).getValue(pt);
+                float depression = b * buttonAnim(isRight ? 10 : 9).getValue(pt);
                 ms.translate(0, depression, 0);
             }
             renderer.renderSolid(joystick, light);
