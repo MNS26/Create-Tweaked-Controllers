@@ -17,6 +17,14 @@ public class JoystickAxisInput implements GenericInput
     public int axisID = -1;
     public float minBound = 0.0f;
     public float maxBound = 1.0f;
+    public float deadzone = 0.0f;
+    public int deviceIndex = 0;
+    // Transient: used during deserialization to decide whether the stream carries a device
+    // index (new profiles do; legacy ones don't). Never written to disk directly.
+    public transient boolean hasDeviceIndex = true;
+    // Transient: used during deserialization to decide whether the stream carries a device
+    // deadzones (new profiles do; legacy ones don't). Never written to disk directly.
+    public transient boolean hasDeviceDeadzone = true;
 
     public JoystickAxisInput(int axisID)
     {
@@ -34,6 +42,14 @@ public class JoystickAxisInput implements GenericInput
         this.maxBound = max;
     }
 
+    public JoystickAxisInput(int deviceIndex, int axisID, float min, float max)
+    {
+        this.deviceIndex = deviceIndex;
+        this.axisID = axisID;
+        this.minBound = min;
+        this.maxBound = max;
+    }
+
     @Override
     public boolean GetButtonValue()
     {
@@ -44,7 +60,9 @@ public class JoystickAxisInput implements GenericInput
     public float GetAxisValue()
     {
         if (!IsInputValid()) return 0;
-        float v = (JoystickInputs.GetAxis(axisID) - minBound) / (maxBound - minBound);
+        float raw = JoystickInputs.GetAxis(deviceIndex, axisID);
+        if (Math.abs(raw) < deadzone) return 0;
+        float v = (raw - minBound) / (maxBound - minBound);
         if (v < 0) v = 0;
         if (v > 1) v = 1;
         return v;
@@ -55,22 +73,22 @@ public class JoystickAxisInput implements GenericInput
     {
         if (minBound >= 0 && maxBound >= 0)
         {
-            return CreateTweakedControllers.translateDirect("gui_input_joystick_axis", "+"+axisID);
+            return CreateTweakedControllers.translateDirect("gui_input_joystick_axis", "+"+deviceIndex+":"+axisID);
         }
         else if (minBound <= 0 && maxBound <= 0)
         {
-            return CreateTweakedControllers.translateDirect("gui_input_joystick_axis", "-"+axisID);
+            return CreateTweakedControllers.translateDirect("gui_input_joystick_axis", "-"+deviceIndex+":"+axisID);
         }
         else
         {
-            return CreateTweakedControllers.translateDirect("gui_input_joystick_axis", ""+axisID);
+            return CreateTweakedControllers.translateDirect("gui_input_joystick_axis", ""+deviceIndex+":"+axisID);
         }
     }
 
     @Override
     public boolean IsInputValid()
     {
-        return axisID < JoystickInputs.GetAxisCount() && axisID >= 0 && minBound != maxBound;
+        return axisID < JoystickInputs.GetAxisCount(deviceIndex) && axisID >= 0 && minBound != maxBound;
     }
 
     @Override
@@ -79,6 +97,8 @@ public class JoystickAxisInput implements GenericInput
         buf.writeFloat(minBound);
         buf.writeFloat(maxBound);
         buf.writeInt(axisID);
+        buf.writeInt(deviceIndex);
+        buf.writeFloat(deadzone);
     }
 
     @Override
@@ -87,6 +107,22 @@ public class JoystickAxisInput implements GenericInput
         minBound = buf.readFloat();
         maxBound = buf.readFloat();
         axisID = buf.readInt();
+        if (hasDeviceIndex)
+        {
+            deviceIndex = buf.readInt();
+        }
+        else
+        {
+            deviceIndex = 0;
+        }
+        if (hasDeviceDeadzone)
+        {
+            deadzone = buf.readFloat();
+        }
+        else
+        {
+            deadzone = 0.0f;
+        }
     }
 
     @Override
@@ -110,7 +146,7 @@ public class JoystickAxisInput implements GenericInput
     public float GetRawInput()
     {
         if (!IsInputValid()) return 0;
-        return JoystickInputs.GetAxis(axisID);
+        return JoystickInputs.GetAxis(deviceIndex, axisID);
     }
     
 }

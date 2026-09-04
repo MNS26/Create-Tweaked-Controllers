@@ -39,6 +39,10 @@ public class ModControllerConfigScreen extends AbstractSimiScreen
     private InputList inputBindsList;
     //private ControlType selectedProfile = ControlType.KEYBOARD_MOUSE;
     private boolean saved = true;
+    // Number of frames to ignore mouse inputs right after starting to bind an input,
+    // so that the initial mouse click/movement that opens binding isn't captured.
+    private int bindDelay = 0;
+    private static final int BIND_DELAY_FRAMES = 16;
 
     public ModControllerConfigScreen(Screen p)
     {
@@ -89,10 +93,11 @@ public class ModControllerConfigScreen extends AbstractSimiScreen
     @Override
     public boolean mouseClicked(double x, double y, int button)
     {
-        if (selectedInput != -1)
+        if (selectedInput != -1 && bindDelay <= 0)
         {
             TweakedControlsUtil.profile.layout[selectedInput] = new MouseButtonInput(button);
             selectedInput = -1;
+            bindDelay = 0;
             TweakedControlsUtil.profile.UpdateProfileData();
             return true;
         }
@@ -186,11 +191,20 @@ public class ModControllerConfigScreen extends AbstractSimiScreen
     {
         TweakedControlsUtil.GuiUpdate();
         MouseCursorHandler.SetShouldCancelScroll(selectedInput != -1);
-        if (selectedInput != -1 && (HandleMouseMovement() || HandleJoystickButtons() || HandleJoystickAxis() || HandleMouseScroll()))
+        if (selectedInput != -1)
         {
-            selectedInput = -1;
-            saved = false;
-            TweakedControlsUtil.profile.UpdateProfileData();
+            if (bindDelay > 0)
+            {
+                bindDelay--;
+                MouseCursorHandler.ResetCenter();
+            }
+            else if (HandleJoystickButtons() || HandleJoystickAxis() || HandleMouseScroll() || HandleMouseMovement())
+            {
+                selectedInput = -1;
+                bindDelay = 0;
+                saved = false;
+                TweakedControlsUtil.profile.UpdateProfileData();
+            }
         }
         
         inputBindsList.render(ms, mouseX, mouseY, partialTicks);
@@ -226,9 +240,13 @@ public class ModControllerConfigScreen extends AbstractSimiScreen
     public void SetActiveInput(int index)
     {
         selectedInput = index;
+        bindDelay = BIND_DELAY_FRAMES;
         MouseCursorHandler.ResetCenter();
-        JoystickInputs.StoreAxisValues();
-        JoystickInputs.StoreButtonsValues();
+        for (int device : JoystickInputs.GetPresentDevices())
+        {
+            JoystickInputs.StoreAxisValues(device);
+            JoystickInputs.StoreButtonsValues(device);
+        }
     }
 
     public int GetActiveInput()
@@ -267,34 +285,40 @@ public class ModControllerConfigScreen extends AbstractSimiScreen
 
     private boolean HandleJoystickButtons()
     {
-        if (!JoystickInputs.HasJoystick()) return false;
-        int val = JoystickInputs.GetFirstButton();
-        if (val < 0) return false;
-        JoystickButtonInput input = new JoystickButtonInput(val);
-        input.invertValue = JoystickInputs.GetStoredButton(val);
-        TweakedControlsUtil.profile.layout[selectedInput] = input;
-        return true;
+        for (int device : JoystickInputs.GetPresentDevices())
+        {
+            int val = JoystickInputs.GetFirstButton(device);
+            if (val < 0) continue;
+            JoystickButtonInput input = new JoystickButtonInput(device, val);
+            input.invertValue = JoystickInputs.GetStoredButton(device, val);
+            TweakedControlsUtil.profile.layout[selectedInput] = input;
+            return true;
+        }
+        return false;
     }
 
     private boolean HandleJoystickAxis()
     {
-        if (!JoystickInputs.HasJoystick()) return false;
-        int val = JoystickInputs.GetFirstAxis();
-        if (val < 0) return false;
-        float start = JoystickInputs.GetStoredAxis(val);
-        float dest = JoystickInputs.GetAxis(val);
-        if (Math.abs(start) > 0.5f) // Probably a trigger
+        for (int device : JoystickInputs.GetPresentDevices())
         {
-            start = Math.copySign(1.0f, start);
-            dest = -start;
+            int val = JoystickInputs.GetFirstAxis(device);
+            if (val < 0) continue;
+            float start = JoystickInputs.GetStoredAxis(device, val);
+            float dest = JoystickInputs.GetAxis(device, val);
+            if (Math.abs(start) > 0.5f) // Probably a trigger
+            {
+                start = Math.copySign(1.0f, start);
+                dest = -start;
+            }
+            else // Probably a joystick
+            {
+                start = 0.0f;
+                dest = Math.copySign(1.0f, dest);
+            }
+            TweakedControlsUtil.profile.layout[selectedInput] = new JoystickAxisInput(device, val, start, dest);
+            return true;
         }
-        else // Probably a joystick
-        {
-            start = 0.0f;
-            dest = Math.copySign(1.0f, dest);
-        }
-        TweakedControlsUtil.profile.layout[selectedInput] = new JoystickAxisInput(val, start, dest);
-        return true;
+        return false;
     }
 
     private void Populate()

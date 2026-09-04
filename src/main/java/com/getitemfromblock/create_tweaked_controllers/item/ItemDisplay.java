@@ -1,8 +1,8 @@
 package com.getitemfromblock.create_tweaked_controllers.item;
 
-import com.getitemfromblock.create_tweaked_controllers.CreateTweakedControllers;
+//import com.getitemfromblock.create_tweaked_controllers.CreateTweakedControllers;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Items;
+//import net.minecraft.world.item.Items;
 
 public class ItemDisplay
 {

@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.Blocks;
 import static com.simibubi.create.foundation.data.TagGen.axeOnly;
 
 import com.getitemfromblock.create_tweaked_controllers.CreateTweakedControllers;
-import com.getitemfromblock.create_tweaked_controllers.ModTab;
+//import com.getitemfromblock.create_tweaked_controllers.ModTab;
 
 public class ModBlocks
 {

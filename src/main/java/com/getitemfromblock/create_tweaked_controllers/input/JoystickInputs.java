@@ -2,117 +2,134 @@ package com.getitemfromblock.create_tweaked_controllers.input;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 import org.lwjgl.glfw.GLFW;
 
 public class JoystickInputs
 {
-    private static Vector<Boolean> buttons = new Vector<>(0);
-    private static Vector<Float> axis = new Vector<>(0);
-    private static Vector<Boolean> storedButtons = new Vector<>(0);
-    private static Vector<Float> storedAxis = new Vector<>(0);
+    private static class DeviceState
+    {
+        Vector<Boolean> buttons = new Vector<>(0);
+        Vector<Float> axis = new Vector<>(0);
+        Vector<Boolean> storedButtons = new Vector<>(0);
+        Vector<Float> storedAxis = new Vector<>(0);
+    }
 
-    protected static int selectedJoystick = -1;
+    private static final int MAX_JOYSTICKS = 16;
+    private static final DeviceState[] devices = new DeviceState[MAX_JOYSTICKS];
+    private static final List<Integer> presentDevices = new ArrayList<>();
+
+    // Backwards compatibility: the index of the "primary" joystick, used by the simple
+    // single-device API (GetButton(int), GetAxis(int), HasJoystick(), etc.)
+    private static int selectedJoystick = -1;
+
+    // Smaller threshold so precise HOTAS/sim axes (which rarely reach +/-0.75) still register.
+    private static final float AXIS_CHANGE_THRESHOLD = 0.75f;
 
     public static void GetControls()
     {
-        if (selectedJoystick < 0)
+        presentDevices.clear();
+        int primary = -1;
+        for (int i = 0; i < MAX_JOYSTICKS; i++)
         {
-            int uniqueJoystickID = -1;
-            for (int i = 0; i < 16 && selectedJoystick < 0; i++)
+            if (!GLFW.glfwJoystickPresent(i))
             {
-                if (!GLFW.glfwJoystickPresent(i)) continue;
-                if (uniqueJoystickID == -1) // At least one joystick is found
-                {
-                    uniqueJoystickID = i;
-                }
-                else if (uniqueJoystickID >= 0) // More than one joystick is found
-                {
-                    uniqueJoystickID = -2;
-                }
-                ByteBuffer res = GLFW.glfwGetJoystickButtons(i); // Check for joystick activity
-                if (res == null) continue;
-                for (int b = 0; b < res.limit(); b++)
-                {
-                    if (res.get(b) != GLFW.GLFW_PRESS) continue;
-                    SelectJoystick(i);
-                    break;
-                }
+                devices[i] = null;
+                continue;
             }
-            if (selectedJoystick < 0 && uniqueJoystickID >= 0) // Exactly one joystick is found, no need to check for activity
+            if (primary == -1) primary = i;
+            presentDevices.add(i);
+            DeviceState state = devices[i];
+            ByteBuffer b = GLFW.glfwGetJoystickButtons(i);
+            FloatBuffer a = GLFW.glfwGetJoystickAxes(i);
+            if (b == null && a == null)
             {
-                SelectJoystick(uniqueJoystickID);
+                devices[i] = null;
+                continue;
             }
+            if (state == null || state.buttons.size() != (b == null ? 0 : b.limit())
+                || state.axis.size() != (a == null ? 0 : a.limit()))
+            {
+                state = new DeviceState();
+                initDeviceState(state, b, a);
+                devices[i] = state;
+            }
+            Fill(state, b, a);
         }
-        if (selectedJoystick >= 0 && GLFW.glfwJoystickPresent(selectedJoystick))
+        if (presentDevices.isEmpty())
         {
-            ByteBuffer b = GLFW.glfwGetJoystickButtons(selectedJoystick);
-            FloatBuffer a = GLFW.glfwGetJoystickAxes(selectedJoystick);
-            if (b == null || buttons.size() != b.limit()
-                || a == null || axis.size() != a.limit())
-            {
-                Empty();
-                selectedJoystick = -1;
-            }
-            else
-            {
-                Fill(b, a);
-            }
-        }
-        else
-        {
-            Empty();
             selectedJoystick = -1;
         }
-    }
-
-    private static void SelectJoystick(int id)
-    {
-        selectedJoystick = id;
-        ByteBuffer b = GLFW.glfwGetJoystickButtons(selectedJoystick);
-        if (b == null)
-        {
-            buttons = new Vector<>();
-            storedButtons = new Vector<>();
-        }
         else
         {
-            buttons = new Vector<>(b.limit());
-            storedButtons = new Vector<>(b.limit());
-            for (int i = 0; i < b.limit(); i++)
-            {
-                buttons.add(false);
-                storedButtons.add(false);
-            }
-        }
-
-        FloatBuffer a = GLFW.glfwGetJoystickAxes(selectedJoystick);
-        if (a == null)
-        {
-            axis = new Vector<>();
-            storedAxis = new Vector<>();
-        }
-        else {
-            axis = new Vector<>(a.limit());
-            storedAxis = new Vector<>(a.limit());
-            for (int i = 0; i < a.limit(); i++)
-            {
-                axis.add(0.0f);
-                storedAxis.add(0.0f);
-            }
+            selectedJoystick = primary;
         }
     }
+
+    private static void initDeviceState(DeviceState state, ByteBuffer b, FloatBuffer a)
+    {
+        int nButtons = b == null ? 0 : b.limit();
+        int nAxis = a == null ? 0 : a.limit();
+        state.buttons = new Vector<>(nButtons);
+        state.storedButtons = new Vector<>(nButtons);
+        for (int i = 0; i < nButtons; i++)
+        {
+            state.buttons.add(false);
+            state.storedButtons.add(false);
+        }
+        state.axis = new Vector<>(nAxis);
+        state.storedAxis = new Vector<>(nAxis);
+        for (int i = 0; i < nAxis; i++)
+        {
+            state.axis.add(0.0f);
+            state.storedAxis.add(0.0f);
+        }
+    }
+
+    public static boolean IsJoystickPresent(int deviceId)
+    {
+        return deviceId >= 0 && deviceId < MAX_JOYSTICKS && devices[deviceId] != null;
+    }
+
+    public static List<Integer> GetPresentDevices()
+    {
+        return Collections.unmodifiableList(presentDevices);
+    }
+
+    public static int GetButtonCount(int deviceId)
+    {
+        return IsJoystickPresent(deviceId) ? devices[deviceId].buttons.size() : 0;
+    }
+
+    public static int GetAxisCount(int deviceId)
+    {
+        return IsJoystickPresent(deviceId) ? devices[deviceId].axis.size() : 0;
+    }
+
+    public static boolean GetButton(int deviceId, int button)
+    {
+        return button < 0 || button >= GetButtonCount(deviceId) ? false : devices[deviceId].buttons.get(button);
+    }
+
+    public static float GetAxis(int deviceId, int axis)
+    {
+        return axis < 0 || axis >= GetAxisCount(deviceId) ? 0.0f : devices[deviceId].axis.get(axis);
+    }
+
+    // ---- Single-device (backwards compatible) API, delegating to the primary device ----
 
     public static int GetButtonCount()
     {
-        return HasJoystick() ? buttons.size() : 0;
+        return HasJoystick() ? devices[selectedJoystick].buttons.size() : 0;
     }
 
     public static int GetAxisCount()
     {
-        return HasJoystick() ? axis.size() : 0;
+        return HasJoystick() ? devices[selectedJoystick].axis.size() : 0;
     }
 
     public static int GetJoystickIndex()
@@ -132,73 +149,119 @@ public class JoystickInputs
 
     public static boolean GetButton(int button)
     {
-        return button >= GetButtonCount() ? false : JoystickInputs.buttons.get(button);
+        return GetButton(selectedJoystick, button);
     }
 
     public static float GetAxis(int axis)
     {
-        return axis >= GetAxisCount() ? 0.0f : JoystickInputs.axis.get(axis);
+        return GetAxis(selectedJoystick, axis);
     }
 
-    public static void Empty()
+    private static void Fill(DeviceState state, ByteBuffer b, FloatBuffer a)
     {
-        Collections.fill(buttons, false);
-        Collections.fill(axis, 0.0f);
+        if (b != null)
+        {
+            for (int i = 0; i < b.limit(); i++)
+            {
+                state.buttons.set(i, b.get(i) == GLFW.GLFW_PRESS);
+            }
+        }
+        if (a != null)
+        {
+            for (int i = 0; i < a.limit(); i++)
+            {
+                state.axis.set(i, a.get(i));
+            }
+        }
     }
 
-    public static void Fill(ByteBuffer b, FloatBuffer a)
+    // ---- Per-device stored-value accessors for the binding UI ----
+
+    public static void StoreAxisValues(int deviceId)
     {
-        for (int i = 0; i < b.limit(); i++)
+        if (!IsJoystickPresent(deviceId)) return;
+        DeviceState s = devices[deviceId];
+        for (int i = 0; i < s.axis.size(); i++)
         {
-            buttons.set(i, b.get(i) == GLFW.GLFW_PRESS);
-        }
-        for (int i = 0; i < a.limit(); i++)
-        {
-            axis.set(i, a.get(i));
+            s.storedAxis.set(i, s.axis.get(i));
         }
     }
+
+    public static void StoreButtonsValues(int deviceId)
+    {
+        if (!IsJoystickPresent(deviceId)) return;
+        DeviceState s = devices[deviceId];
+        for (int i = 0; i < s.buttons.size(); i++)
+        {
+            s.storedButtons.set(i, s.buttons.get(i));
+        }
+    }
+
+    public static int GetFirstButton(int deviceId)
+    {
+        if (!IsJoystickPresent(deviceId)) return -1;
+        DeviceState s = devices[deviceId];
+        for (int i = 0; i < s.buttons.size(); i++)
+        {
+            if (s.buttons.get(i) != s.storedButtons.get(i)) return i;
+        }
+        return -1;
+    }
+
+    public static int GetFirstAxis(int deviceId)
+    {
+        if (!IsJoystickPresent(deviceId)) return -1;
+        DeviceState s = devices[deviceId];
+        for (int i = 0; i < s.axis.size(); i++)
+        {
+            if (Math.abs(s.axis.get(i) - s.storedAxis.get(i)) > AXIS_CHANGE_THRESHOLD) return i;
+        }
+        return -1;
+    }
+
+    public static float GetStoredAxis(int deviceId, int index)
+    {
+        if (!IsJoystickPresent(deviceId)) return 0.0f;
+        DeviceState s = devices[deviceId];
+        return index < 0 || index >= s.storedAxis.size() ? 0.0f : s.storedAxis.get(index);
+    }
+
+    public static boolean GetStoredButton(int deviceId, int index)
+    {
+        if (!IsJoystickPresent(deviceId)) return false;
+        DeviceState s = devices[deviceId];
+        return index >= 0 && index < s.storedButtons.size() ? s.storedButtons.get(index) : false;
+    }
+
+    // ---- Single-device (backwards compatible) stored-value accessors ----
 
     public static void StoreAxisValues()
     {
-        for (int i = 0; i < axis.size(); i++)
-        {
-            storedAxis.set(i, axis.get(i));
-        }
+        StoreAxisValues(selectedJoystick);
     }
 
     public static void StoreButtonsValues()
     {
-        for (int i = 0; i < buttons.size(); i++)
-        {
-            storedButtons.set(i, buttons.get(i));
-        }
+        StoreButtonsValues(selectedJoystick);
     }
 
     public static int GetFirstButton()
     {
-        for (int i = 0; i < buttons.size(); i++)
-        {
-            if (buttons.get(i) != storedButtons.get(i)) return i;
-        }
-        return -1;
+        return GetFirstButton(selectedJoystick);
     }
 
     public static int GetFirstAxis()
     {
-        for (int i = 0; i < axis.size(); i++)
-        {
-            if (Math.abs(axis.get(i) - storedAxis.get(i)) > 0.75f) return i;
-        }
-        return -1;
+        return GetFirstAxis(selectedJoystick);
     }
 
     public static float GetStoredAxis(int index)
     {
-        return storedAxis.get(index);
+        return GetStoredAxis(selectedJoystick, index);
     }
 
     public static boolean GetStoredButton(int index)
     {
-        return storedButtons.get(index);
+        return GetStoredButton(selectedJoystick, index);
     }
 }

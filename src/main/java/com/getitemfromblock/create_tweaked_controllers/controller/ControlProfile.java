@@ -25,8 +25,14 @@ public class ControlProfile
     public boolean hasMouseScroll = false;
     public ArrayList<KeyMapping> duplicatedKeys = new ArrayList<KeyMapping>();
 
-    public static final byte CURRENT_VERSION_MAJOR = (byte) 0x01;
-    public static final byte CURRENT_VERSION_MINOR = (byte) 0x00;
+    public static final byte CURRENT_VERSION_MAJOR = (byte) 0x02;
+    public static final byte CURRENT_VERSION_MINOR = (byte) 0x03;
+    // Profiles saved with major version 1 (or unversioned) store joystick inputs without a
+    // per-input device index, so any joystick input in them is assigned to device 0.
+    public static final byte VERSION_WITH_DEVICE_INDEX = (byte) 0x02;
+    
+    // Profiles saved with major version 2, minor >= 3 include a per-axis deadzone field.
+    public static final int MIN_VERSION_WITH_DEADZONE = (0x02 << 8) | 0x03;
     
     public ControlProfile()
     {
@@ -238,33 +244,7 @@ public class ControlProfile
                 }
                 version = 256 * header[6] + header[7];
             }
-            for (int i = 0; i < layout.length; i++)
-            {
-                switch (InputType.GetType(buf.readByte()))
-                {
-                    case NONE:
-                        layout[i] = null;
-                        break;
-                    case JOYSTICK_BUTTON:
-                        layout[i] = new JoystickButtonInput();
-                        break;
-                    case JOYSTICK_AXIS:
-                        layout[i] = new JoystickAxisInput();
-                        break;
-                    case MOUSE_BUTTON:
-                        layout[i] = new MouseButtonInput();
-                        break;
-                    case MOUSE_AXIS:
-                        layout[i] = new MouseAxisInput();
-                        break;
-                    case KEYBOARD_KEY:
-                        layout[i] = new KeyboardInput();
-                        break;
-                    default:
-                        throw new IOException("Corrupted Profile Data!");
-                }
-                if (layout[i] != null) layout[i].Deserialize(buf);
-            }
+            LoadInputs(buf, version);
             file.close();
         }
         catch (IOException e)
@@ -290,35 +270,27 @@ public class ControlProfile
         {
             FileInputStream file = new FileInputStream(f);
             DataInputStream buf = new DataInputStream(file);
-            for (int i = 0; i < layout.length; i++)
+
+            // Detect a versioned profile by checking for the magic header. Legacy (unversioned)
+            // profiles begin directly with the first entry's type byte (0-6) and never with 'C'.
+            byte[] header = buf.readNBytes(8);
+            boolean hasHeader = header.length == 8;
+            for (int i = 0; i < 6 && hasHeader; i++)
             {
-                switch (InputType.GetType(buf.readByte()))
-                {
-                    case NONE:
-                        layout[i] = null;
-                        break;
-                    case JOYSTICK_BUTTON:
-                        layout[i] = new JoystickButtonInput();
-                        break;
-                    case JOYSTICK_AXIS:
-                        layout[i] = new JoystickAxisInput();
-                        break;
-                    case MOUSE_BUTTON:
-                        layout[i] = new MouseButtonInput();
-                        break;
-                    case MOUSE_AXIS:
-                        layout[i] = new MouseAxisInput();
-                        break;
-                    case MOUSE_WHEEL:
-                        layout[i] = new MouseWheelInput();
-                        break;
-                    case KEYBOARD_KEY:
-                        layout[i] = new KeyboardInput();
-                        break;
-                    default:
-                        throw new IOException("Corrupted Profile Data!");
-                }
-                if (layout[i] != null) layout[i].Deserialize(buf);
+                if (header[i] != headerNameData[i]) hasHeader = false;
+            }
+            if (hasHeader)
+            {
+                int version = 256 * header[6] + header[7];
+                LoadInputs(buf, version);
+            }
+            else
+            {
+                // Rewind and read the whole file as a legacy, unversioned profile.
+                file.close();
+                file = new FileInputStream(f);
+                buf = new DataInputStream(file);
+                LoadInputs(buf, 0);
             }
             file.close();
         }
@@ -330,6 +302,57 @@ public class ControlProfile
                 CreateTweakedControllers.error(line.toString());
             }
             return;
+        }
+    }
+
+    // Reads the 25 layout entries. The version is used to decide whether joystick inputs
+    // carry a device index (version >= VERSION_WITH_DEVICE_INDEX). Legacy profiles with a
+    // lower version default to deviceIndex 0.
+    private void LoadInputs(DataInputStream buf, int version) throws IOException
+    {
+        boolean hasDeviceIndex = version >= VERSION_WITH_DEVICE_INDEX;
+        boolean hasDeviceDeadzone = version >= MIN_VERSION_WITH_DEADZONE;
+        for (int i = 0; i < layout.length; i++)
+        {
+            byte type = buf.readByte();
+            GenericInput input = null;
+            switch (InputType.GetType(type))
+            {
+                case JOYSTICK_BUTTON:
+                {
+                    JoystickButtonInput jb = new JoystickButtonInput();
+                    jb.hasDeviceIndex = hasDeviceIndex;
+                    input = jb;
+                    break;
+                }
+                case JOYSTICK_AXIS:
+                {
+                    JoystickAxisInput ja = new JoystickAxisInput();
+                    ja.hasDeviceIndex = hasDeviceIndex;
+                    ja.hasDeviceDeadzone = hasDeviceDeadzone;
+                    input = ja;
+                    break;
+                }
+                case MOUSE_BUTTON:
+                    input = new MouseButtonInput();
+                    break;
+                case MOUSE_AXIS:
+                    input = new MouseAxisInput();
+                    break;
+                case MOUSE_WHEEL:
+                    input = new MouseWheelInput();
+                    break;
+                case KEYBOARD_KEY:
+                    input = new KeyboardInput();
+                    break;
+                case NONE:
+                default:
+                    if (type != InputType.GetValue(InputType.NONE))
+                        throw new IOException("Corrupted Profile Data!");
+                    break;
+            }
+            layout[i] = input;
+            if (input != null) input.Deserialize(buf);
         }
     }
 
@@ -346,14 +369,12 @@ public class ControlProfile
             f.createNewFile();
             FileOutputStream file = new FileOutputStream(f);
             DataOutputStream buf = new DataOutputStream(file);
-            /*
             for (int i = 0; i < headerNameData.length; i++)
             {
                 buf.writeByte(headerNameData[i]);
             }
             buf.writeByte(CURRENT_VERSION_MAJOR);
             buf.writeByte(CURRENT_VERSION_MINOR);
-            */
             for (int i = 0; i < layout.length; i++)
             {
                 if (layout[i] != null)

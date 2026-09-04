@@ -57,20 +57,25 @@ public class ModConfigScreen extends AbstractSimiScreen
         int bHeight = 20;
         int bShortWidth = 98;
         int bLongWidth = 200;
+        
         addRenderableWidget(Button.builder(CreateTweakedControllers.translateDirect("menu.return"), ($) -> {
             this.linkTo(parent);
         }).bounds(center - 100, yStart + 92, bLongWidth, bHeight).build());
+        
         addRenderableWidget(Button.builder(CreateTweakedControllers.translateDirect("menu.config_general"), ($) -> {
             ConfigScreen.modID = CreateTweakedControllers.ID;
             this.linkTo((new SubMenuConfigScreen(this, ModConfig.Type.CLIENT, ModClientConfig.SPEC)));
         }).bounds(center - 100, yStart + 8, bLongWidth, bHeight).build());
+        
         advancedConfigButton = new Button.Builder(CreateTweakedControllers.translateDirect("menu.config_controller"), ($) -> {
             this.linkTo((new ModControllerConfigScreen(this)));
         }).bounds(center - 100, yStart + 32, bLongWidth, bHeight).build();
         addRenderableWidget(advancedConfigButton);
+        
         addRenderableWidget(Button.builder(CreateTweakedControllers.translateDirect("menu.issues"), ($) -> {
             this.linkTo("https://github.com/getItemFromBlock/Create-Tweaked-Controllers/issues");
         }).bounds(center + 2, yStart + 68, bShortWidth, bHeight).build());
+        
         addRenderableWidget(Button.builder(CreateTweakedControllers.translateDirect("menu.wiki"), ($) -> {
             this.linkTo("https://github.com/getItemFromBlock/Create-Tweaked-Controllers/wiki");
         }).bounds(center - 100, yStart + 68, bShortWidth, bHeight).build());

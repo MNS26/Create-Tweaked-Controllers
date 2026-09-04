@@ -16,9 +16,19 @@ public class JoystickButtonInput implements GenericInput
 {
     public int buttonID = -1;
     public boolean invertValue = false;
+    public int deviceIndex = 0;
+    // Transient: used during deserialization to decide whether the stream carries a device
+    // index (new profiles do; legacy ones don't). Never written to disk directly.
+    public transient boolean hasDeviceIndex = true;
 
     public JoystickButtonInput(int buttonID)
     {
+        this.buttonID = buttonID;
+    }
+
+    public JoystickButtonInput(int deviceIndex, int buttonID)
+    {
+        this.deviceIndex = deviceIndex;
         this.buttonID = buttonID;
     }
 
@@ -30,7 +40,7 @@ public class JoystickButtonInput implements GenericInput
     public boolean GetButtonValue()
     {
         if (!IsInputValid()) return invertValue;
-        return invertValue ? !JoystickInputs.GetButton(buttonID) : JoystickInputs.GetButton(buttonID);
+        return invertValue ? !JoystickInputs.GetButton(deviceIndex, buttonID) : JoystickInputs.GetButton(deviceIndex, buttonID);
     }
 
     @Override
@@ -42,13 +52,13 @@ public class JoystickButtonInput implements GenericInput
     @Override
     public MutableComponent GetDisplayName()
     {
-        return CreateTweakedControllers.translateDirect("gui_input_joystick_button", ""+buttonID);
+        return CreateTweakedControllers.translateDirect("gui_input_joystick_button", ""+deviceIndex+":"+buttonID);
     }
 
     @Override
     public boolean IsInputValid()
     {
-        return buttonID < JoystickInputs.GetButtonCount() && buttonID >= 0;
+        return buttonID < JoystickInputs.GetButtonCount(deviceIndex) && buttonID >= 0;
     }
 
     @Override
@@ -56,6 +66,7 @@ public class JoystickButtonInput implements GenericInput
     {
         buf.writeBoolean(invertValue);
         buf.writeInt(buttonID);
+        buf.writeInt(deviceIndex);
     }
 
     @Override
@@ -63,6 +74,14 @@ public class JoystickButtonInput implements GenericInput
     {
         invertValue = buf.readBoolean();
         buttonID = buf.readInt();
+        if (hasDeviceIndex)
+        {
+            deviceIndex = buf.readInt();
+        }
+        else
+        {
+            deviceIndex = 0;
+        }
     }
 
     @Override

@@ -56,6 +56,9 @@ public class TweakedLinkedControllerClientHandler
     private static int axisPacketCooldown = 0;
     private static boolean useLock = false;
 
+    // Smaller threshold so precise HOTAS/sim axes (which rarely reach +/-0.75) still register.
+    private static final float AXIS_CHANGE_THRESHOLD = 0.75f;
+
     public static void toggleBindMode(BlockPos location)
     {
         if (MODE == Mode.IDLE)
@@ -286,7 +289,7 @@ public class TweakedLinkedControllerClientHandler
             }
             for (int i = 0; i < 6; i++)
             {
-                if ((i < 4 && Math.abs(GamepadInputs.axis[i]) > 0.8f) || (i >= 4 && GamepadInputs.axis[i] > 0))
+                if ((i < 4 && Math.abs(GamepadInputs.axis[i]) > AXIS_CHANGE_THRESHOLD) || (i >= 4 && GamepadInputs.axis[i] > 0))
                 {
                     LinkBehaviour linkBehaviour = BlockEntityBehaviour.get(mc.level, selectedLocation, LinkBehaviour.TYPE);
                     if (linkBehaviour != null)
