@@ -44,7 +44,7 @@ public class JoystickAxisScreen extends GenericInputScreen
         source.minBound = ParseFloatAndCorrectValue(bounds[0]);
         source.maxBound = ParseFloatAndCorrectValue(bounds[1]);
         if (bounds[0].isFocused()) bounds[1].setFocused(false);
-        if (!deadzoneBox.isFocused()) source.deadzone = ParseFloatAndCorrectValue(deadzoneBox);
+        source.deadzone = ParseFloatAndCorrectValue(deadzoneBox);
         valueRender.setValue(String.format("%.03f", source.GetRawInput()));
         valueRender.setFocused(false);
         graphics.drawString(font, CreateTweakedControllers.translateDirect("gui_config_lower"), width / 2 - boundsTextWidth, height / 2 - 50, 0xaaaaaa);
